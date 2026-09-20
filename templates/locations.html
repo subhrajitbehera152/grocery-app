@@ -1,50 +1,284 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Select Location</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <style>
-        body {
-            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
-            font-family: 'Segoe UI', sans-serif;
-        }
-        .location-card {
-            background: rgba(255,255,255,0.15);
-            border-radius: 15px;
-            padding: 30px;
-            text-align: center;
-            color: #fff;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .location-card:hover {
-            transform: translateY(-8px) scale(1.05);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.3);
-        }
-        .location-icon {
-            font-size: 50px;
-            margin-bottom: 15px;
-        }
-        h1 {
-            color: #fff;
-            text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Select Location</title>
+
+  <!-- Fonts and icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --accent-1: #74ebd5;
+      --accent-2: #ACB6E5;
+      --card-glass: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      --card-border: rgba(255,255,255,0.10);
+      --text-strong: #f3f7fb;
+      --muted: rgba(243,247,251,0.78);
+      --radius: 16px;
+      --shadow: 0 12px 30px rgba(2,6,23,0.36);
+    }
+
+    /* Make the page background match the item/card color exactly */
+    html,body{
+      height:100%;
+      margin:0;
+      font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      /* Background uses the same tones as the cards: a soft, desaturated gradient */
+      background: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 100%);
+      color:var(--text-strong);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    /* Soft vignette to add depth while keeping the color unified */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background: radial-gradient(60% 40% at 10% 10%, rgba(0,0,0,0.06), transparent 20%),
+                  radial-gradient(60% 40% at 90% 90%, rgba(0,0,0,0.06), transparent 20%);
+      mix-blend-mode:multiply;
+    }
+
+    main.container {
+      padding:36px 18px;
+      max-width:1100px;
+    }
+
+    .panel {
+      background: var(--card-glass);
+      border-radius: calc(var(--radius) + 6px);
+      padding:22px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(8px) saturate(120%);
+    }
+
+    .header-row {
+      display:flex;
+      gap:16px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+
+    h1.page-title{
+      font-weight:700;
+      margin:0;
+      font-size:1.7rem;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      color:var(--text-strong);
+    }
+    p.lead { margin:0; color:var(--muted); font-size:0.95rem; }
+
+    /* Search */
+    .search-wrap { display:flex; gap:10px; align-items:center; margin-top:12px; }
+    .search-input input{
+      width:100%;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.02);
+      color:var(--text-strong);
+      outline:none;
+      transition: box-shadow .25s ease, transform .25s ease;
+    }
+    .search-input input:focus{
+      box-shadow: 0 8px 30px rgba(10,20,40,0.28);
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,0.12);
+    }
+
+    /* Grid */
+    .locations-grid {
+      margin-top:20px;
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap:18px;
+    }
+
+    /* Card style (items) */
+    .location-card {
+      background: var(--card-glass);
+      border-radius:14px;
+      padding:18px;
+      text-align:center;
+      color:var(--text-strong);
+      box-shadow: 0 10px 28px rgba(2,6,23,0.28);
+      border:1px solid var(--card-border);
+      transition: transform 320ms cubic-bezier(.2,.9,.3,1), box-shadow 320ms, border-color 320ms;
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      min-height:160px;
+      justify-content:center;
+      text-decoration:none;
+    }
+    .location-card:hover,
+    .location-card:focus {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 22px 48px rgba(2,6,23,0.45);
+      border-color: rgba(255,255,255,0.18);
+    }
+
+    .location-icon {
+      font-size:46px;
+      width:84px;
+      height:84px;
+      margin:0 auto;
+      display:grid;
+      place-items:center;
+      border-radius:14px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      box-shadow: inset 0 -6px 18px rgba(0,0,0,0.12);
+    }
+    .location-title { font-weight:700; font-size:1.05rem; margin:0; }
+    .location-sub { color:var(--muted); font-size:0.92rem; margin-top:6px; }
+
+    .badge-cta {
+      margin-top:10px;
+      align-self:center;
+      font-size:0.82rem;
+      padding:6px 12px;
+      border-radius:999px;
+      background: rgba(255,255,255,0.02);
+      color:var(--muted);
+      border:1px solid rgba(255,255,255,0.03);
+    }
+
+    /* Floating particles for subtle motion */
+    .particles {
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      z-index:0;
+    }
+    .particle {
+      position:absolute;
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background: rgba(255,255,255,0.06);
+      filter: blur(6px);
+      animation: float 8s linear infinite;
+    }
+    @keyframes float {
+      0% { transform: translateY(0) translateX(0) scale(1); opacity:0.6; }
+      50% { transform: translateY(-30px) translateX(12px) scale(1.2); opacity:0.9; }
+      100% { transform: translateY(0) translateX(-8px) scale(1); opacity:0.6; }
+    }
+
+    /* Entrance */
+    .fade-in { opacity:0; transform: translateY(8px); animation: enter 520ms cubic-bezier(.2,.9,.3,1) forwards; }
+    @keyframes enter { to { opacity:1; transform:none; } }
+
+    /* Responsive */
+    @media (max-width:576px){
+      h1.page-title { font-size:1.3rem; }
+      .location-icon { width:64px; height:64px; font-size:36px; }
+    }
+  </style>
 </head>
-<body class="container mt-4">
-    <h1 class="mb-4 text-center">🌆 Choose Your Location</h1>
-    <div class="row">
-        {% for loc in locations %}
-        <div class="col-md-4 mb-4">
-            <a href="{{ url_for('location', loc_id=loc[0]) }}" style="text-decoration:none;">
-                <div class="location-card">
-                    <div class="location-icon">📍</div>
-                    <h3>{{ loc[1] }}</h3>
-                    <p style="opacity:0.8;">Click to explore shops</p>
-                </div>
-            </a>
+<body>
+  <!-- subtle particles layer -->
+  <div class="particles" aria-hidden="true">
+    <div class="particle" style="left:8%; top:12%; animation-duration:9s; width:8px; height:8px;"></div>
+    <div class="particle" style="left:28%; top:72%; animation-duration:11s; width:12px; height:12px;"></div>
+    <div class="particle" style="left:62%; top:22%; animation-duration:10s; width:10px; height:10px;"></div>
+    <div class="particle" style="left:82%; top:58%; animation-duration:12s; width:9px; height:9px;"></div>
+  </div>
+
+  <main class="container">
+    <div class="panel" role="region" aria-label="Choose location panel">
+      <div class="header-row">
+        <div>
+          <h1 class="page-title">🌆 Choose Your Location</h1>
+          <p class="lead">Find shops, offers, and local favorites near you</p>
         </div>
+
+        <div style="min-width:260px;">
+          <div class="search-wrap">
+            <div class="search-input w-100" role="search" aria-label="Search locations">
+              <input id="locationSearch" type="search" placeholder="Search locations or neighborhoods" aria-label="Search locations" />
+            </div>
+            <button id="clearSearch" class="btn btn-outline-light" title="Clear search" aria-label="Clear search">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="locationsGrid" class="locations-grid mt-3" aria-live="polite">
+        {% for loc in locations %}
+        <a href="{{ url_for('location', loc_id=loc[0]) }}"
+           class="location-card fade-in"
+           data-name="{{ loc[1]|lower }}"
+           data-id="{{ loc[0] }}"
+           data-title="{{ loc[1]|e }}"
+           role="button"
+           aria-label="Open {{ loc[1] }} shops"
+           tabindex="0">
+          <div class="location-icon" aria-hidden="true">📍</div>
+          <h3 class="location-title">{{ loc[1] }}</h3>
+          <div class="location-sub">Click to explore shops</div>
+          <div class="badge-cta">View shops <i class="bi bi-arrow-right-short"></i></div>
+        </a>
         {% endfor %}
+      </div>
     </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function(){
+      const search = document.getElementById('locationSearch');
+      const clearBtn = document.getElementById('clearSearch');
+      const grid = document.getElementById('locationsGrid');
+      const cards = Array.from(grid.querySelectorAll('.location-card'));
+
+      function filterLocations(q){
+        const term = (q || '').trim().toLowerCase();
+        cards.forEach(card => {
+          const name = card.dataset.name || '';
+          card.style.display = (!term || name.includes(term)) ? '' : 'none';
+        });
+      }
+
+      function debounce(fn, wait=160){
+        let t;
+        return function(...args){
+          clearTimeout(t);
+          t = setTimeout(()=>fn.apply(this,args), wait);
+        };
+      }
+
+      search.addEventListener('input', debounce((e) => filterLocations(e.target.value), 120));
+      clearBtn.addEventListener('click', () => { search.value=''; filterLocations(''); search.focus(); });
+
+      // keyboard: Enter opens link
+      cards.forEach(card => {
+        card.addEventListener('keydown', (ev) => {
+          if(ev.key === 'Enter' || ev.key === ' '){
+            ev.preventDefault();
+            const href = card.getAttribute('href');
+            if(href) window.location = href;
+          }
+        });
+        // stagger animation
+        card.style.animationDelay = (Array.prototype.indexOf.call(cards, card) * 40) + 'ms';
+      });
+
+      filterLocations('');
+    })();
+  </script>
 </body>
 </html>

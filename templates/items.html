@@ -1,170 +1,380 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Shop Items</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <style>
-        body {
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            padding-top: 180px; /* space for header + category bar */
-        }
-        /* Sticky Header */
-        .sticky-header {
-            position: fixed; top: 0; left: 0; right: 0;
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(8px);
-            z-index: 1100;
-            border-bottom: 2px solid #fcb69f;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .sticky-header .btn, .sticky-header input, .sticky-header button {
-            font-size: 1.5rem; /* bigger buttons and input */
-            padding: 14px 24px;
-        }
-        /* Sticky Category Bar */
-        .category-bar {
-            position: fixed; top: 90px; left: 0; right: 0;
-            background: rgba(255,255,255,0.95);
-            z-index: 1000;
-            padding: 15px;
-            border-bottom: 2px solid #fcb69f;
-        }
-        .nav-pills .nav-link {
-            font-size: 1.4rem;
-            padding: 14px 24px;
-            border-radius: 30px;
-            margin: 5px;
-            font-weight: 600;
-        }
-        .nav-pills .nav-link.active {
-            background: #f77f00;
-        }
-        /* Scrollable Items Section */
-        .items-container {
-            margin-top: 20px;
-            height: calc(100vh - 200px); /* full height minus header+category */
-            overflow-y: auto;
-            padding-right: 10px;
-        }
-        /* Item Cards */
-        .card {
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .card:hover {
-            transform: translateY(-6px) scale(1.03);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-        }
-        .card img {
-            height: 280px;
-            object-fit: cover;
-        }
-        .card-title { font-size: 1.6rem; font-weight: bold; }
-        .card-text { font-size: 1.4rem; }
-        .quantity-box {
-            font-size: 1.5rem;
-            min-width: 180px;
-            background: rgba(255,255,255,0.7);
-            border-radius: 12px;
-            padding: 12px;
-        }
-        .btn-sm {
-            font-size: 1.6rem;
-            padding: 16px 28px;
-            border-radius: 50px;
-        }
-        /* Mobile Tweaks */
-        @media (max-width: 576px) {
-            .card img { height: 220px; }
-            .card-title { font-size: 1.5rem; }
-            .card-text { font-size: 1.3rem; }
-            .btn-sm { font-size: 1.8rem; padding: 18px 32px; }
-            .quantity-box { font-size: 1.6rem; min-width: 200px; }
-            .sticky-header .btn, .sticky-header input, .sticky-header button {
-                font-size: 1.6rem; padding: 16px 28px;
-            }
-            .nav-pills .nav-link { font-size: 1.5rem; padding: 16px 28px; }
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Shop Items</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    :root{
+      --accent:#f77f00;
+      --accent-2:#ffb86b;
+      --glass: rgba(255,255,255,0.88);
+      --muted:#6b6b6b;
+      --card-shadow: 0 12px 30px rgba(0,0,0,0.10);
+      --radius:14px;
+      --touch:56px;
+    }
+
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial;
+      background: linear-gradient(135deg,#ffecd2 0%,#fcb69f 100%);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      color:#222;
+      padding-bottom:40px;
+    }
+
+    /* Top sticky header */
+    .topbar{
+      position:fixed; top:0; left:0; right:0;
+      height:88px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; padding:12px 18px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.98), rgba(255,255,255,0.94));
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      z-index:1200;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+    }
+    .brand { display:flex; gap:12px; align-items:center; }
+    .logo {
+      width:56px; height:56px; border-radius:12px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      color:#fff; display:flex; align-items:center; justify-content:center;
+      font-weight:900; font-size:1.15rem; box-shadow:var(--card-shadow);
+    }
+    .brand .title { font-weight:800; font-size:1.05rem; line-height:1; }
+    .brand .subtitle { font-size:0.78rem; color:var(--muted); margin-top:2px; }
+
+    /* header controls */
+    .top-controls { display:flex; gap:10px; align-items:center; }
+    .search-input{
+      width:420px; max-width:42vw; border-radius:12px; padding:10px 14px;
+      border:1px solid rgba(0,0,0,0.06); font-size:1rem;
+      background:rgba(255,255,255,0.98);
+    }
+    .top-controls .btn { border-radius:12px; padding:10px 14px; font-weight:700; }
+
+    /* category bar pinned under header */
+    .category-bar{
+      position:fixed; top:88px; left:0; right:0; z-index:1100;
+      background: rgba(255,255,255,0.96); padding:12px 18px;
+      border-bottom:1px solid rgba(0,0,0,0.03);
+      display:flex; justify-content:center; box-shadow: 0 6px 18px rgba(0,0,0,0.03);
+    }
+    .category-list { display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:center; }
+    .category-pill {
+      padding:10px 18px; border-radius:999px; font-weight:700; font-size:0.98rem;
+      background:transparent; border:1px solid rgba(0,0,0,0.04); cursor:pointer;
+      transition: transform .12s ease, background .12s ease, color .12s ease;
+    }
+    .category-pill.active { background:var(--accent); color:#fff; transform:translateY(-3px); box-shadow:0 8px 20px rgba(247,127,0,0.12); }
+
+    /* main layout: left product list scrolls, right optional sticky summary on wide screens */
+    .container-main {
+      max-width:1200px; margin:160px auto 60px; padding:0 18px;
+      display:grid; grid-template-columns: 1fr 360px; gap:28px;
+    }
+
+    .items-panel {
+      background:var(--glass); border-radius:16px; padding:18px; box-shadow:var(--card-shadow);
+      height: calc(100vh - 260px); overflow:auto; scroll-behavior:smooth;
+    }
+
+    .grid {
+      display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:18px;
+    }
+
+    .product {
+      background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.95));
+      border-radius:12px; overflow:hidden; border:1px solid rgba(0,0,0,0.03);
+      transition: transform .18s ease, box-shadow .18s ease;
+      display:flex; flex-direction:column; min-height:360px;
+    }
+    .product:hover { transform: translateY(-8px); box-shadow: 0 22px 50px rgba(0,0,0,0.12); }
+
+    .product .media {
+      height:180px; background:#f3f3f3; display:flex; align-items:center; justify-content:center;
+      overflow:hidden;
+    }
+    .product .media img { width:100%; height:100%; object-fit:cover; display:block; }
+
+    .product .body { padding:14px; display:flex; flex-direction:column; gap:8px; flex:1; }
+    .title { font-weight:800; font-size:1.05rem; color:#222; }
+    .meta { color:var(--muted); font-size:0.9rem; }
+    .price { font-weight:900; color:var(--accent); font-size:1.15rem; margin-top:6px; }
+
+    .controls {
+      display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:auto;
+    }
+
+    .qty {
+      display:inline-flex; align-items:center; gap:10px; background:rgba(0,0,0,0.03);
+      padding:8px; border-radius:12px;
+    }
+    .qty button {
+      width:var(--touch); height:var(--touch); border-radius:12px; border:none; font-size:1.25rem;
+      display:inline-flex; align-items:center; justify-content:center; cursor:pointer;
+      transition: transform .08s ease;
+    }
+    .qty button:active { transform:scale(.96); }
+    .qty .count { min-width:56px; text-align:center; font-weight:800; font-size:1.05rem; }
+
+    .add-btn {
+      background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; border:none;
+      padding:10px 14px; border-radius:12px; font-weight:900; cursor:pointer;
+      box-shadow: 0 10px 26px rgba(247,127,0,0.12);
+    }
+
+    /* right summary (desktop) */
+    .summary {
+      position:sticky; top:120px; background:linear-gradient(180deg, #fff, #fff);
+      border-radius:16px; padding:18px; box-shadow:var(--card-shadow); height:fit-content;
+    }
+    .summary h4 { margin:0 0 8px 0; font-weight:900; }
+    .summary .row { display:flex; justify-content:space-between; margin:8px 0; font-weight:700; }
+    .summary .pay { font-size:1.4rem; color:var(--accent); font-weight:900; margin-top:8px; }
+
+    /* toast */
+    .toast-notice {
+      position:fixed; left:50%; transform:translateX(-50%); bottom:28px;
+      background:rgba(0,0,0,0.85); color:#fff; padding:12px 18px; border-radius:12px;
+      box-shadow:0 8px 30px rgba(0,0,0,0.25); z-index:1400; opacity:0; pointer-events:none;
+      transition: opacity .25s ease, transform .25s ease;
+    }
+    .toast-notice.show { opacity:1; transform:translateX(-50%) translateY(-6px); pointer-events:auto; }
+
+    /* skeleton for lazy loading */
+    .skeleton { background:linear-gradient(90deg,#eee,#f6f6f6,#eee); background-size:200% 100%; animation: shimmer 1.2s linear infinite; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    /* responsive */
+    @media (max-width: 980px){
+      .container-main { grid-template-columns: 1fr; margin:140px 16px 60px; }
+      .top-controls .search-input { width:220px; }
+      .category-bar { padding:10px; }
+      .topbar { height:96px; gap:8px; }
+    }
+    @media (max-width: 576px){
+      .search-input { display:none; }
+      .top-controls .btn { padding:10px 12px; font-size:0.95rem; }
+      .product .media { height:160px; }
+      .qty button { width:48px; height:48px; }
+      .topbar { padding:10px; height:96px; }
+      .category-pill { padding:8px 12px; font-size:0.95rem; }
+    }
+  </style>
 </head>
 <body>
 
-    <!-- Sticky Header -->
-    <div class="sticky-header d-flex justify-content-between align-items-center">
-        <a href="/" class="btn btn-outline-success fw-bold">🏠 Home</a>
-        <form class="d-flex" action="{{ url_for('location', loc_id=loc_id) }}" method="GET">
-            <input class="form-control me-2" type="search" name="q" placeholder="Search items..." value="{{ search_query or '' }}">
-            <button class="btn btn-outline-primary" type="submit">🔍</button>
-        </form>
-        <a href="{{ url_for('view_cart') }}" class="btn btn-warning fw-bold">View Cart 🛒</a>
+  <!-- Topbar -->
+  <header class="topbar container-fluid">
+    <div class="brand">
+      <div class="logo">G</div>
+      <div>
+        <div class="title">Grocery</div>
+        <div class="subtitle">Smart shopping</div>
+      </div>
     </div>
 
-    <!-- Sticky Category Bar -->
-    <div class="category-bar">
-        <ul class="nav nav-pills justify-content-center flex-wrap">
-            {% for category, items in categories.items() %}
-                <li class="nav-item">
-                    <a class="nav-link {% if loop.first %}active{% endif %}" data-bs-toggle="tab" href="#cat{{ loop.index }}">
-                        {{ category }}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
+    <div class="top-controls">
+      <form action="{{ url_for('location', loc_id=loc_id) }}" method="GET" class="d-flex align-items-center" style="gap:8px;">
+        <input class="search-input" type="search" name="q" placeholder="Search items or categories..." value="{{ search_query or '' }}" aria-label="Search items" />
+        <button class="btn btn-outline-primary" type="submit" aria-label="Search">🔍</button>
+      </form>
 
-    <!-- Scrollable Items -->
-    <div class="items-container tab-content">
+      <a href="/" class="btn btn-outline-success" aria-label="Home">🏠 Home</a>
+      <a href="{{ url_for('view_cart') }}" class="btn btn-warning" aria-label="View cart">🛒 Cart</a>
+    </div>
+  </header>
+
+  <!-- Category bar -->
+  <nav class="category-bar" aria-label="Categories">
+    <div class="category-list">
+      {% for category, items in categories.items() %}
+        <button class="category-pill {% if loop.first %}active{% endif %}" data-target="#cat{{ loop.index }}" type="button">{{ category }}</button>
+      {% endfor %}
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="container-main">
+    <!-- Items panel (scrollable) -->
+    <section class="items-panel" aria-label="Products">
+      <div class="grid" id="products-grid">
         {% for category, items in categories.items() %}
-        <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="cat{{ loop.index }}">
-            <div class="row">
-                {% for item in items %}
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <img src="{{ item[4] or 'https://via.placeholder.com/400x280.png?text=' ~ item[1] }}" class="card-img-top" alt="{{ item[1] }}">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">{{ item[1] }}</h5>
-                            <p class="card-text">💰 ₹{{ item[3] }}</p>
-                            <div class="d-flex justify-content-center align-items-center">
-                                <button class="btn btn-danger btn-sm update-cart" data-id="{{ item[0] }}" data-action="remove">➖</button>
-                                <span class="quantity-box mx-2" id="qty-{{ item[0] }}">
-                                    {% if session.get('cart') and session['cart'].get(item[0]|string) %}
-                                        Qty: {{ session['cart'][item[0]|string] }} <br>
-                                        Total: ₹{{ session['cart'][item[0]|string] * item[3] }}
-                                    {% else %}
-                                        Qty: 0 <br>Total: ₹0
-                                    {% endif %}
-                                </span>
-                                <button class="btn btn-success btn-sm update-cart" data-id="{{ item[0] }}" data-action="add">➕</button>
-                            </div>
-                        </div>
-                    </div>
+          <div class="category-block" id="cat{{ loop.index }}" style="grid-column:1/-1; margin-bottom:6px;">
+            <h5 style="margin:8px 0 12px 6px; font-weight:900;">{{ category }}</h5>
+            <div class="grid" role="list">
+              {% for item in items %}
+              <article class="product" role="listitem" id="product-{{ item[0] }}" data-id="{{ item[0] }}" data-price="{{ item[3] }}">
+                <div class="media">
+                  <img loading="lazy" src="{{ item[4] or 'https://via.placeholder.com/600x360.png?text=' ~ item[1] }}" alt="{{ item[1] }}">
                 </div>
-                {% endfor %}
-            </div>
-        </div>
-        {% endfor %}
-    </div>
+                <div class="body">
+                  <div class="title">{{ item[1] }}</div>
+                  <div class="meta">Category: {{ item[2] }}</div>
+                  <div class="price">₹{{ "%.2f"|format(item[3]) }}</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.querySelectorAll('.update-cart').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                const itemId = this.dataset.id;
-                const action = this.dataset.action;
-                fetch(`/update_cart/${itemId}/${action}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        const qtyBox = document.getElementById(`qty-${data.item_id}`);
-                        qtyBox.innerHTML = `Qty: ${data.qty} <br>Total: ₹${data.subtotal}`;
-                    });
-            });
-        });
-    </script>
+                  <div class="controls">
+                    <div class="qty" aria-label="Quantity controls for {{ item[1] }}">
+                      <button class="btn btn-outline-danger qty-decrease" data-id="{{ item[0] }}" aria-label="Decrease">−</button>
+                      <div class="count" id="qty-{{ item[0] }}">
+                        {% if session.get('cart') and session['cart'].get(item[0]|string) %}
+                          {{ session['cart'][item[0]|string] }}
+                        {% else %}
+                          0
+                        {% endif %}
+                      </div>
+                      <button class="btn btn-outline-success qty-increase" data-id="{{ item[0] }}" aria-label="Increase">+</button>
+                    </div>
+
+                    <button class="add-btn" data-id="{{ item[0] }}" aria-label="Add to cart">Add</button>
+                  </div>
+                </div>
+              </article>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Summary (desktop) -->
+    <aside class="summary" aria-label="Order summary">
+      <h4>Quick Summary</h4>
+      <div class="row"><span>Items</span><span id="summary-items">0</span></div>
+      <div class="row"><span>Subtotal</span><span>₹<span id="summary-subtotal">0.00</span></span></div>
+      <div class="row"><span>Delivery</span><span>₹<span id="summary-delivery">0.00</span></span></div>
+      <div class="row pay"><span>Total</span><span>₹<span id="summary-total">0.00</span></span></div>
+      <div class="delivery-note" id="delivery-note">Free delivery for orders above ₹150</div>
+      <div style="margin-top:12px;">
+        <a href="{{ url_for('view_cart') }}" class="btn btn-primary w-100">View Cart & Checkout</a>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Toast -->
+  <div id="toast" class="toast-notice" role="status" aria-live="polite"></div>
+
+  <script>
+    // Config
+    const FREE_THRESHOLD = 150;
+    const DELIVERY_FEE = 30;
+
+    // Helpers
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(()=> t.classList.remove('show'), 2200);
+    }
+
+    // Category pill behavior: activate and scroll to block
+    document.querySelectorAll('.category-pill').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('.category-pill').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const target = document.querySelector(btn.dataset.target);
+        if (target) {
+          target.scrollIntoView({behavior:'smooth', block:'start'});
+        }
+      });
+    });
+
+    // Update summary from DOM
+    function recalcSummary() {
+      let items = 0, subtotal = 0;
+      document.querySelectorAll('[id^="product-"]').forEach(prod=>{
+        const id = prod.dataset.id;
+        const price = parseFloat(prod.dataset.price) || 0;
+        const qtyEl = document.getElementById('qty-'+id);
+        const qty = qtyEl ? parseInt(qtyEl.textContent) || 0 : 0;
+        items += qty;
+        subtotal += qty * price;
+      });
+      subtotal = Math.round(subtotal * 100) / 100;
+      const delivery = (subtotal > 0 && subtotal < FREE_THRESHOLD) ? DELIVERY_FEE : 0;
+      const total = Math.round((subtotal + delivery) * 100) / 100;
+
+      document.getElementById('summary-items').textContent = items;
+      document.getElementById('summary-subtotal').textContent = subtotal.toFixed(2);
+      document.getElementById('summary-delivery').textContent = delivery.toFixed(2);
+      document.getElementById('summary-total').textContent = total.toFixed(2);
+
+      const note = document.getElementById('delivery-note');
+      if (subtotal === 0) note.textContent = 'Your cart is empty';
+      else if (delivery === 0) note.textContent = 'You have free delivery 🎉';
+      else note.textContent = `Add ₹${(FREE_THRESHOLD - subtotal).toFixed(2)} more for free delivery`;
+    }
+
+    // Wire up quantity buttons and Add button to call your Flask endpoint
+    async function updateCartRequest(itemId, action) {
+      try {
+        const res = await fetch(`/update_cart/${itemId}/${action}`);
+        if (!res.ok) throw new Error('Network error');
+        return await res.json();
+      } catch (e) {
+        console.error(e);
+        showToast('Could not update cart. Try again.');
+        return null;
+      }
+    }
+
+    // Increase / decrease handlers
+    document.querySelectorAll('.qty-increase').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const id = btn.dataset.id;
+        const data = await updateCartRequest(id, 'add');
+        if (!data) return;
+        const qtyEl = document.getElementById('qty-'+data.item_id);
+        if (qtyEl) qtyEl.textContent = data.qty;
+        showToast('Added one item');
+        recalcSummary();
+      });
+    });
+
+    document.querySelectorAll('.qty-decrease').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const id = btn.dataset.id;
+        const data = await updateCartRequest(id, 'remove');
+        if (!data) return;
+        const qtyEl = document.getElementById('qty-'+data.item_id);
+        if (qtyEl) qtyEl.textContent = data.qty;
+        showToast('Removed one item');
+        recalcSummary();
+      });
+    });
+
+    // Add button sets qty to +1 (same as increase)
+    document.querySelectorAll('.add-btn').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const id = btn.dataset.id;
+        const data = await updateCartRequest(id, 'add');
+        if (!data) return;
+        const qtyEl = document.getElementById('qty-'+data.item_id);
+        if (qtyEl) qtyEl.textContent = data.qty;
+        showToast('Item added to cart');
+        recalcSummary();
+      });
+    });
+
+    // Initial summary calc
+    recalcSummary();
+
+    // Accessibility: keyboard support for pills and buttons
+    document.querySelectorAll('.category-pill, .qty button, .add-btn').forEach(el=>{
+      el.addEventListener('keydown', (e)=>{
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); }
+      });
+    });
+
+    // Optional: lazy re-calc when server updates session externally
+    // Polling disabled by default. Uncomment to enable light polling.
+    // setInterval(recalcSummary, 3000);
+  </script>
 </body>
 </html>
