@@ -49,12 +49,21 @@
     .brand .subtitle { font-size:0.78rem; color:var(--muted); margin-top:2px; }
 
     /* header controls */
-    .top-controls { display:flex; gap:10px; align-items:center; }
+    .search-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+    .search-container form {
+      width: 100%; 
+      max-width: 420px;
+    }
     .search-input{
-      width:420px; max-width:42vw; border-radius:12px; padding:10px 14px;
+      width:100%; border-radius:12px; padding:10px 14px;
       border:1px solid rgba(0,0,0,0.06); font-size:1rem;
       background:rgba(255,255,255,0.98);
     }
+    .top-controls { display:flex; gap:10px; align-items:center; }
     .top-controls .btn { border-radius:12px; padding:10px 14px; font-weight:700; }
 
     /* category bar pinned under header */
@@ -120,7 +129,7 @@
       transition: transform .08s ease;
     }
     .qty button:active { transform:scale(.96); }
-    .qty .count { min-width:56px; text-align:center; font-weight:800; font-size:1.05rem; }
+    .qty .count { min-width:32px; text-align:center; font-weight:800; font-size:1.05rem; }
 
     .add-btn {
       background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; border:none;
@@ -146,24 +155,49 @@
     }
     .toast-notice.show { opacity:1; transform:translateX(-50%) translateY(-6px); pointer-events:auto; }
 
-    /* skeleton for lazy loading */
-    .skeleton { background:linear-gradient(90deg,#eee,#f6f6f6,#eee); background-size:200% 100%; animation: shimmer 1.2s linear infinite; }
-    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-
     /* responsive */
     @media (max-width: 980px){
       .container-main { grid-template-columns: 1fr; margin:140px 16px 60px; }
-      .top-controls .search-input { width:220px; }
-      .category-bar { padding:10px; }
-      .topbar { height:96px; gap:8px; }
+      .search-container form { max-width: 280px; }
     }
+    
     @media (max-width: 576px){
-      .search-input { display:none; }
-      .top-controls .btn { padding:10px 12px; font-size:0.95rem; }
-      .product .media { height:160px; }
-      .qty button { width:48px; height:48px; }
-      .topbar { padding:10px; height:96px; }
-      .category-pill { padding:8px 12px; font-size:0.95rem; }
+      /* Mobile Header Layout */
+      .topbar {
+        height: auto;
+        flex-wrap: wrap;
+        padding: 10px 14px;
+        gap: 12px;
+      }
+      .brand { order: 1; }
+      .top-controls { order: 2; gap: 8px; }
+      .top-controls .btn { padding: 8px 12px; font-size: 0.95rem; }
+      .search-container { order: 3; flex: 100%; }
+      .search-container form { max-width: 100%; margin-bottom: 4px; }
+      .search-input { display: block; } /* Re-enabled search input */
+      
+      /* Adjust margins for taller mobile header */
+      .category-bar { top: 136px; padding: 10px; }
+      .container-main { margin: 210px 10px 60px; }
+      .category-pill { padding: 8px 12px; font-size: 0.95rem; }
+
+      /* Mobile 2-Column Product Grid */
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .product { min-height: 250px; }
+      .product .media { height: 120px; }
+      .product .body { padding: 10px; gap: 6px; }
+      .title { font-size: 0.9rem; }
+      .meta { font-size: 0.8rem; }
+      .price { font-size: 1rem; margin-top: 4px; }
+      
+      /* Mobile Product Controls */
+      .controls { flex-direction: column; gap: 8px; align-items: stretch; }
+      .qty { width: 100%; justify-content: space-between; padding: 6px; }
+      .qty button { width: 34px; height: 34px; font-size: 1.1rem; }
+      .add-btn { width: 100%; padding: 8px; font-size: 0.95rem; }
     }
   </style>
 </head>
@@ -179,14 +213,17 @@
       </div>
     </div>
 
-    <div class="top-controls">
+    <!-- Grouped Search Container -->
+    <div class="search-container">
       <form action="{{ url_for('location', loc_id=loc_id) }}" method="GET" class="d-flex align-items-center" style="gap:8px;">
-        <input class="search-input" type="search" name="q" placeholder="Search items or categories..." value="{{ search_query or '' }}" aria-label="Search items" />
+        <input class="search-input" type="search" name="q" placeholder="Search items..." value="{{ search_query or '' }}" aria-label="Search items" />
         <button class="btn btn-outline-primary" type="submit" aria-label="Search">🔍</button>
       </form>
+    </div>
 
-      <a href="/" class="btn btn-outline-success" aria-label="Home">🏠 Home</a>
-      <a href="{{ url_for('view_cart') }}" class="btn btn-warning" aria-label="View cart">🛒 Cart</a>
+    <div class="top-controls">
+      <a href="/" class="btn btn-outline-success" aria-label="Home">🏠 <span class="d-none d-sm-inline">Home</span></a>
+      <a href="{{ url_for('view_cart') }}" class="btn btn-warning" aria-label="View cart">🛒 <span class="d-none d-sm-inline">Cart</span></a>
     </div>
   </header>
 
@@ -230,7 +267,6 @@
                       </div>
                       <button class="btn btn-outline-success qty-increase" data-id="{{ item[0] }}" aria-label="Increase">+</button>
                     </div>
-
                     <button class="add-btn" data-id="{{ item[0] }}" aria-label="Add to cart">Add</button>
                   </div>
                 </div>
@@ -371,10 +407,6 @@
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); }
       });
     });
-
-    // Optional: lazy re-calc when server updates session externally
-    // Polling disabled by default. Uncomment to enable light polling.
-    // setInterval(recalcSummary, 3000);
   </script>
 </body>
 </html>
