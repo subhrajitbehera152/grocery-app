@@ -8,7 +8,7 @@
             background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
             font-family: 'Segoe UI', sans-serif;
             margin: 0;
-            padding-top: 140px; /* space for header + category bar */
+            padding-top: 180px; /* space for header + category bar */
         }
         /* Sticky Header */
         .sticky-header {
@@ -17,21 +17,25 @@
             backdrop-filter: blur(8px);
             z-index: 1100;
             border-bottom: 2px solid #fcb69f;
-            padding: 10px 20px;
+            padding: 20px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .sticky-header .btn, .sticky-header input, .sticky-header button {
+            font-size: 1.5rem; /* bigger buttons and input */
+            padding: 14px 24px;
         }
         /* Sticky Category Bar */
         .category-bar {
-            position: fixed; top: 70px; left: 0; right: 0;
+            position: fixed; top: 90px; left: 0; right: 0;
             background: rgba(255,255,255,0.95);
             z-index: 1000;
-            padding: 10px;
+            padding: 15px;
             border-bottom: 2px solid #fcb69f;
         }
         .nav-pills .nav-link {
-            font-size: 1.1rem;
-            padding: 10px 18px;
-            border-radius: 25px;
+            font-size: 1.4rem;
+            padding: 14px 24px;
+            border-radius: 30px;
             margin: 5px;
             font-weight: 600;
         }
@@ -41,13 +45,13 @@
         /* Scrollable Items Section */
         .items-container {
             margin-top: 20px;
-            height: calc(100vh - 160px); /* full height minus header+category */
+            height: calc(100vh - 200px); /* full height minus header+category */
             overflow-y: auto;
             padding-right: 10px;
         }
         /* Item Cards */
         .card {
-            border-radius: 15px;
+            border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 6px 15px rgba(0,0,0,0.15);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -57,30 +61,34 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.25);
         }
         .card img {
-            height: 220px;
+            height: 280px;
             object-fit: cover;
         }
-        .card-title { font-size: 1.3rem; font-weight: bold; }
-        .card-text { font-size: 1.2rem; }
+        .card-title { font-size: 1.6rem; font-weight: bold; }
+        .card-text { font-size: 1.4rem; }
         .quantity-box {
-            font-size: 1.2rem;
-            min-width: 140px;
+            font-size: 1.5rem;
+            min-width: 180px;
             background: rgba(255,255,255,0.7);
-            border-radius: 10px;
-            padding: 8px;
+            border-radius: 12px;
+            padding: 12px;
         }
         .btn-sm {
-            font-size: 1.2rem;
-            padding: 12px 20px;
+            font-size: 1.6rem;
+            padding: 16px 28px;
             border-radius: 50px;
         }
         /* Mobile Tweaks */
         @media (max-width: 576px) {
-            .card img { height: 180px; }
-            .card-title { font-size: 1.2rem; }
-            .card-text { font-size: 1.1rem; }
-            .btn-sm { font-size: 1.3rem; padding: 14px 24px; }
-            .quantity-box { font-size: 1.3rem; min-width: 150px; }
+            .card img { height: 220px; }
+            .card-title { font-size: 1.5rem; }
+            .card-text { font-size: 1.3rem; }
+            .btn-sm { font-size: 1.8rem; padding: 18px 32px; }
+            .quantity-box { font-size: 1.6rem; min-width: 200px; }
+            .sticky-header .btn, .sticky-header input, .sticky-header button {
+                font-size: 1.6rem; padding: 16px 28px;
+            }
+            .nav-pills .nav-link { font-size: 1.5rem; padding: 16px 28px; }
         }
     </style>
 </head>
@@ -117,7 +125,7 @@
                 {% for item in items %}
                 <div class="col-md-6 mb-4">
                     <div class="card">
-                        <img src="{{ item[4] or 'https://via.placeholder.com/400x220.png?text=' ~ item[1] }}" class="card-img-top" alt="{{ item[1] }}">
+                        <img src="{{ item[4] or 'https://via.placeholder.com/400x280.png?text=' ~ item[1] }}" class="card-img-top" alt="{{ item[1] }}">
                         <div class="card-body text-center">
                             <h5 class="card-title">{{ item[1] }}</h5>
                             <p class="card-text">💰 ₹{{ item[3] }}</p>
