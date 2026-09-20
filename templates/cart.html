@@ -3,60 +3,105 @@
 <head>
     <title>Your Cart</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%);
+            font-family: 'Segoe UI', sans-serif;
+            padding-top: 70px;
+        }
+        .sticky-header {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+            border-bottom: 2px solid #96e6a1;
+            padding: 15px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .sticky-header h3 {
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: #333;
+        }
+        table {
+            background: rgba(255,255,255,0.85);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+        th, td {
+            text-align: center;
+            vertical-align: middle;
+            font-size: 1.1rem;
+            padding: 12px;
+        }
+        .btn-lg {
+            font-size: 1.2rem;
+            padding: 12px 20px;
+            border-radius: 30px;
+        }
+        .total-box {
+            font-size: 1.3rem;
+            font-weight: bold;
+            background: rgba(255,255,255,0.7);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        /* Mobile tweaks */
+        @media (max-width: 576px) {
+            th, td { font-size: 1.2rem; padding: 14px; }
+            .btn-lg { font-size: 1.3rem; padding: 14px 24px; }
+            .total-box { font-size: 1.4rem; }
+            .sticky-header h3 { font-size: 1.2rem; }
+        }
+    </style>
 </head>
-<body class="container mt-4">
-    <h1>Your Cart</h1>
-    <table class="table table-bordered">
-        <thead>
+<body class="container">
+
+    <!-- Sticky Header -->
+    <div class="sticky-header d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">🛒 Your Cart</h3>
+        <a href="/" class="btn btn-success fw-bold">Continue Shopping</a>
+    </div>
+
+    <!-- Cart Table -->
+    <table class="table table-bordered mt-4">
+        <thead class="table-success">
             <tr>
                 <th>Item</th>
-                <th>Price (per unit)</th>
+                <th>Price</th>
                 <th>Quantity</th>
-                <th>Subtotal</th>
-                <th>Actions</th>
+                <th>Total</th>
             </tr>
         </thead>
         <tbody>
-            {% for id, name, price, qty in items %}
+            {% for item in items %}
             <tr>
-                <td>{{ name }}</td>
-                <td>{{ price }}</td>
-                <td>{{ qty }}</td>
-                <!-- ✅ Show subtotal for this item -->
-                <td>{{ price * qty }}</td>
-                <td>
-                    <div class="d-flex align-items-center">
-                        <a href="{{ url_for('update_cart', item_id=id, action='remove') }}" class="btn btn-danger btn-sm">-1</a>
-                        <span class="mx-2">{{ qty }}</span>
-                        <a href="{{ url_for('update_cart', item_id=id, action='add') }}" class="btn btn-success btn-sm">+1</a>
-                    </div>
-                </td>
+                <td>{{ item[1] }}</td>
+                <td>₹{{ item[2] }}</td>
+                <td>{{ item[3] }}</td>
+                <td>₹{{ item[2] * item[3] }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
-    <!-- ✅ Show total for all items -->
-    <h3>Total: {{ total }}</h3>
+    <!-- Total Box -->
+    <div class="total-box">
+        Grand Total: ₹{{ total }}
+    </div>
 
-    <!-- Checkout Form -->
-    <form method="POST" action="{{ url_for('place_order') }}">
-        <div class="mb-3">
-            <label>Name</label>
-            <input type="text" name="name" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label>Address</label>
-            <input type="text" name="address" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label>Mobile</label>
-            <input type="text" name="mobile" class="form-control" required>
-        </div>
-        <button type="submit" class="btn btn-success">Place Order</button>
+    <!-- Checkout Button -->
+    <form action="{{ url_for('place_order') }}" method="POST" class="text-center mt-4">
+        <input type="text" name="name" placeholder="Your Name" class="form-control mb-3" required>
+        <input type="text" name="address" placeholder="Address" class="form-control mb-3" required>
+        <input type="text" name="mobile" placeholder="Mobile Number" class="form-control mb-3" required>
+        <button type="submit" class="btn btn-primary btn-lg">✅ Place Order</button>
     </form>
 
-    <!-- Continue Shopping -->
-    <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Continue Shopping</a>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
