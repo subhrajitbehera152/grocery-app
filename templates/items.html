@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Available Items</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body { padding-top: 80px; }
+        .sticky-header {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: #fff; z-index: 1000;
+            border-bottom: 1px solid #ddd; padding: 10px 20px;
+        }
+        .card { border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        .card img { height: 180px; object-fit: cover; border-radius: 8px 8px 0 0; }
+        .quantity-box { font-weight: bold; min-width: 80px; text-align: center; }
+    </style>
+</head>
+<body class="container">
+
+    <!-- Sticky Header -->
+    <div class="sticky-header d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">Shop Items</h3>
+        <a href="{{ url_for('view_cart') }}" class="btn btn-primary">View Cart 🛒</a>
+    </div>
+
+    <!-- Category Navigation -->
+    <ul class="nav nav-pills category-nav justify-content-center mt-3">
+        {% for category, items in categories.items() %}
+            <li class="nav-item">
+                <a class="nav-link {% if loop.first %}active{% endif %}" 
+                   data-bs-toggle="tab" href="#cat{{ loop.index }}">
+                   {{ category }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Category Content -->
+    <div class="tab-content mt-4">
+        {% for category, items in categories.items() %}
+        <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="cat{{ loop.index }}">
+            <div class="row">
+                {% for item in items %}
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        {% if item[4] %}
+                            <img src="{{ item[4] }}" class="card-img-top" alt="{{ item[1] }}">
+                        {% else %}
+                            <img src="https://via.placeholder.com/300x180.png?text={{ item[1] }}" class="card-img-top" alt="{{ item[1] }}">
+                        {% endif %}
+                        <div class="card-body text-center">
+                            <h5 class="card-title">{{ item[1] }}</h5>
+                            <p class="card-text">Price: ₹{{ item[3] }}</p>
+
+                            <!-- Cart Controls -->
+                            <div class="d-flex justify-content-center align-items-center">
+                                <button class="btn btn-danger btn-sm update-cart" data-id="{{ item[0] }}" data-action="remove">-</button>
+                                
+                                <span class="quantity-box mx-2" id="qty-{{ item[0] }}">
+                                    {% if session.get('cart') and session['cart'].get(item[0]|string) %}
+                                        Qty: {{ session['cart'][item[0]|string] }} <br>
+                                        Total: ₹{{ session['cart'][item[0]|string] * item[3] }}
+                                    {% else %}
+                                        Qty: 0 <br>
+                                        Total: ₹0
+                                    {% endif %}
+                                </span>
+                                
+                                <button class="btn btn-success btn-sm update-cart" data-id="{{ item[0] }}" data-action="add">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- AJAX for cart update -->
+    <script>
+        document.querySelectorAll('.update-cart').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const itemId = this.dataset.id;
+                const action = this.dataset.action;
+
+                fetch(`/update_cart/${itemId}/${action}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const qtyBox = document.getElementById(`qty-${data.item_id}`);
+                        qtyBox.innerHTML = `Qty: ${data.qty} <br>Total: ₹${data.subtotal}`;
+                    });
+            });
+        });
+    </script>
+</body>
+</html>

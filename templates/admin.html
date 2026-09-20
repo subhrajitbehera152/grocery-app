@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="container mt-4">
+    <h1>Admin Panel</h1>
+
+    <!-- Add Location -->
+    <h2>Add Location</h2>
+    <form method="POST">
+        <input type="hidden" name="form_type" value="location">
+        <input class="form-control mb-2" type="text" name="name" placeholder="Location Name" required>
+        <button class="btn btn-primary">Add Location</button>
+    </form>
+
+    <!-- Add Shop -->
+    <h2 class="mt-4">Add Shop</h2>
+    <form method="POST">
+        <input type="hidden" name="form_type" value="shop">
+        <input class="form-control mb-2" type="text" name="name" placeholder="Shop Name" required>
+        <select class="form-control mb-2" name="location_id" required>
+            {% for loc in locations %}
+                <option value="{{ loc[0] }}">{{ loc[1] }}</option>
+            {% endfor %}
+        </select>
+        <button class="btn btn-primary">Add Shop</button>
+    </form>
+
+    <!-- Add Item -->
+    <h2 class="mt-4">Add Item</h2>
+    <form method="POST">
+        <input type="hidden" name="form_type" value="item">
+        <input class="form-control mb-2" type="text" name="name" placeholder="Item Name" required>
+        <select class="form-control mb-2" name="category" required>
+            <option value="Fresh Vegetables">Fresh Vegetables</option>
+            <option value="Fresh Fruits">Fresh Fruits</option>
+            <option value="Dairy, Bread & Eggs">Dairy, Bread & Eggs</option>
+            <option value="Atta, Rice, Oil & Dals">Atta, Rice, Oil & Dals</option>
+            <option value="Meats, Fish & Eggs">Meats, Fish & Eggs</option>
+        </select>
+        <input class="form-control mb-2" type="number" step="0.01" name="price" placeholder="Price" required>
+        <input class="form-control mb-2" type="text" name="photo" placeholder="Photo URL">
+        <select class="form-control mb-2" name="shop_id" required>
+            {% for shop in shops %}
+                <option value="{{ shop[0] }}">{{ shop[1] }}</option>
+            {% endfor %}
+        </select>
+        <button class="btn btn-primary">Add Item</button>
+    </form>
+
+    <!-- Manage Items -->
+    <h2 class="mt-4">Manage Items</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th><th>Category</th><th>Price</th><th>Photo</th><th>Shop</th><th>Location</th><th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item[1] }}</td>
+                <td>{{ item[2] }}</td>
+                <td>₹{{ item[3] }}</td>
+                <td><img src="{{ item[4] }}" width="50"></td>
+                <td>{{ item[5] }}</td>
+                <td>{{ item[6] }}</td>
+                <td>
+                    <a href="{{ url_for('edit_item', item_id=item[0]) }}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{{ url_for('delete_item', item_id=item[0]) }}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
