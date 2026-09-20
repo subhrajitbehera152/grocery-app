@@ -1,315 +1,812 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Your Cart</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Your Cart & Checkout</title>
+
+    <!-- Google Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
-        body {
-            background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%);
-            font-family: 'Segoe UI', sans-serif;
-            padding-top: 90px;
-        }
-        .sticky-header {
-            position: fixed; top: 0; left: 0; right: 0;
-            background: rgba(255,255,255,0.98);
-            backdrop-filter: blur(6px);
-            z-index: 1000;
-            border-bottom: 2px solid #96e6a1;
-            padding: 14px 18px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        .sticky-header h3 {
-            font-weight: 800;
-            font-size: 1.4rem;
-            color: #333;
-            margin: 0;
-        }
-        .sticky-header .btn {
-            font-weight: 700;
-            font-size: 1rem;
-            padding: 10px 14px;
+        :root {
+            --bg-base: #0b0f19;
+            --bg-surface: rgba(22, 30, 46, 0.7);
+            --card-bg: rgba(255, 255, 255, 0.035);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --input-bg: rgba(15, 23, 42, 0.65);
+            --accent-primary: #6366f1;
+            --accent-success: #10b981;
+            --accent-glow: rgba(99, 102, 241, 0.25);
+            --text-strong: #f8fafc;
+            --text-muted: #94a3b8;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 10px;
+            --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .cart-table {
-            background: rgba(255,255,255,0.95);
-            border-radius: 12px;
+        * { box-sizing: border-box; }
+
+        html, body {
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-strong);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Background Glows */
+        .ambient-background {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
             overflow: hidden;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
         }
-        th, td {
-            text-align: center;
+
+        .glow-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(110px);
+            opacity: 0.35;
+            animation: pulseGlow 12s infinite alternate ease-in-out;
+        }
+
+        .glow-blob-1 {
+            width: 550px;
+            height: 550px;
+            top: -120px;
+            left: -100px;
+            background: radial-gradient(circle, #6366f1 0%, transparent 70%);
+        }
+
+        .glow-blob-2 {
+            width: 600px;
+            height: 600px;
+            bottom: -150px;
+            right: -100px;
+            background: radial-gradient(circle, #10b981 0%, transparent 70%);
+            animation-delay: -6s;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1) translate(0, 0); opacity: 0.3; }
+            100% { transform: scale(1.15) translate(30px, -20px); opacity: 0.5; }
+        }
+
+        /* Sticky Glass Header */
+        .sticky-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(11, 15, 25, 0.8);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            z-index: 1000;
+            border-bottom: 1px solid var(--card-border);
+            padding: 14px 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .sticky-header h3 {
+            font-weight: 800;
+            font-size: 1.35rem;
+            margin: 0;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-btn {
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.88rem;
+            padding: 8px 16px;
+            transition: var(--transition-smooth);
+        }
+
+        /* Main Content Padding for Fixed Header */
+        main.container-fluid {
+            position: relative;
+            z-index: 1;
+            padding-top: 96px;
+            padding-bottom: 50px;
+            max-width: 1240px;
+        }
+
+        /* Glass Panel Styling */
+        .glass-panel {
+            background: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+        }
+
+        .section-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-strong);
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* Table Styling */
+        .cart-table-wrapper {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--card-border);
+            overflow: hidden;
+        }
+
+        .custom-table {
+            width: 100%;
+            margin-bottom: 0;
+            color: var(--text-strong);
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .custom-table th {
+            background: rgba(255, 255, 255, 0.04);
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--card-border);
+            font-weight: 700;
+        }
+
+        .custom-table td {
+            padding: 16px;
             vertical-align: middle;
-            font-size: 1.05rem;
-            padding: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 0.95rem;
         }
+
+        .custom-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Quantity Buttons */
         .qty-controls {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-        }
-        .qty-btn {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            font-size: 1.4rem;
-            padding: 0;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .qty-display {
-            min-width: 56px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            text-align: center;
-        }
-        .total-box {
-            font-size: 1.25rem;
-            font-weight: 800;
-            background: rgba(255,255,255,0.9);
-            border-radius: 10px;
-            padding: 16px;
-            text-align: center;
-            margin-top: 18px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-        }
-        .delivery-note {
-            margin-top: 8px;
-            font-size: 0.98rem;
-            color: #555;
-        }
-        .checkout-form .form-control {
-            font-size: 1.05rem;
-            padding: 12px 14px;
-            border-radius: 10px;
-        }
-        .checkout-form .btn-primary {
-            font-size: 1.15rem;
-            padding: 12px 20px;
-            border-radius: 12px;
-        }
-        .empty-cart {
-            text-align: center;
-            padding: 40px 20px;
-            font-size: 1.2rem;
-            color: #444;
+            gap: 8px;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 4px 6px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--card-border);
         }
 
-        @media (max-width: 576px) {
-            body { padding-top: 110px; }
-            th, td { font-size: 1.15rem; padding: 12px; }
-            .qty-btn { width: 60px; height: 60px; font-size: 1.6rem; border-radius: 14px; }
-            .qty-display { min-width: 70px; font-size: 1.25rem; }
-            .sticky-header h3 { font-size: 1.25rem; }
-            .total-box { font-size: 1.35rem; padding: 18px; }
-            .checkout-form .form-control { font-size: 1.15rem; padding: 14px; }
-            .checkout-form .btn-primary { font-size: 1.25rem; padding: 14px 22px; }
+        .qty-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .qty-btn.btn-minus {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+        }
+        .qty-btn.btn-minus:hover {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        .qty-btn.btn-plus {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+        }
+        .qty-btn.btn-plus:hover {
+            background: #10b981;
+            color: #ffffff;
+        }
+
+        .qty-display {
+            min-width: 36px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        /* Order Breakdown Box */
+        .summary-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            padding: 22px;
+            border: 1px solid var(--card-border);
+            margin-bottom: 24px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.92rem;
+            color: var(--text-muted);
+        }
+
+        .summary-row.total-row {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.12);
+            color: var(--text-strong);
+            font-size: 1.15rem;
+            font-weight: 800;
+        }
+
+        .free-delivery-badge {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            color: #34d399;
+            font-size: 0.82rem;
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            margin-top: 12px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* Form Controls */
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .input-group-custom {
+            position: relative;
+        }
+
+        .input-group-custom i.icon-prefix {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1rem;
+            pointer-events: none;
+            transition: var(--transition-smooth);
+            z-index: 2;
+        }
+
+        .form-control-custom {
+            width: 100%;
+            padding: 12px 14px 12px 42px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--card-border);
+            background: var(--input-bg);
+            color: var(--text-strong);
+            font-size: 0.95rem;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        .form-control-custom::placeholder {
+            color: #64748b;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px var(--accent-glow);
+            background: rgba(15, 23, 42, 0.85);
+        }
+
+        .form-control-custom:focus ~ i.icon-prefix {
+            color: var(--accent-primary);
+        }
+
+        .location-btn {
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #818cf8;
+            border-radius: var(--radius-sm);
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 8px 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            width: 100%;
+            justify-content: center;
+            margin-top: 8px;
+        }
+
+        .location-btn:hover {
+            background: var(--accent-primary);
+            color: #ffffff;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 1.05rem;
+            padding: 14px;
+            border-radius: var(--radius-md);
+            width: 100%;
+            box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4);
+            transition: var(--transition-smooth);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -5px rgba(16, 185, 129, 0.5);
+            background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+        }
+
+        /* Checkbox Styling */
+        .form-check-input {
+            background-color: var(--input-bg);
+            border-color: var(--card-border);
+            cursor: pointer;
+        }
+        .form-check-input:checked {
+            background-color: var(--accent-primary);
+            border-color: var(--accent-primary);
+        }
+        .form-check-label {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* Empty Cart Styling */
+        .empty-cart-card {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .empty-icon {
+            font-size: 3.5rem;
+            color: var(--text-muted);
+            opacity: 0.5;
+            margin-bottom: 16px;
+        }
+
+        /* Entry Animation */
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Mobile Layout Optimizations */
+        @media (max-width: 768px) {
+            main.container-fluid { padding-top: 86px; padding-left: 12px; padding-right: 12px; }
+            .glass-panel { padding: 18px; border-radius: 20px; }
+            .sticky-header { padding: 12px 16px; }
+            .sticky-header h3 { font-size: 1.15rem; }
+            .custom-table th, .custom-table td { padding: 10px 8px; font-size: 0.88rem; }
+            .qty-btn { width: 28px; height: 28px; font-size: 0.9rem; }
+            .qty-controls { padding: 2px 4px; gap: 4px; }
         }
     </style>
 </head>
-<body class="container">
+<body>
+
+    <!-- Ambient Glowing Spots -->
+    <div class="ambient-background" aria-hidden="true">
+        <div class="glow-blob glow-blob-1"></div>
+        <div class="glow-blob glow-blob-2"></div>
+    </div>
 
     <!-- Sticky Header -->
-    <div class="sticky-header d-flex justify-content-between align-items-center">
-        <h3 class="mb-0">🛒 Your Cart</h3>
-        <div>
-            <a href="/" class="btn btn-success me-2 fw-bold">Continue Shopping</a>
-            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">Home</a>
+    <header class="sticky-header d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-cart3 fs-4 text-indigo"></i>
+            <h3>Your Cart</h3>
         </div>
-    </div>
+        <div class="d-flex gap-2">
+            <a href="/" class="btn btn-sm btn-success header-btn d-none d-sm-inline-block">
+                <i class="bi bi-bag-plus me-1"></i> Continue Shopping
+            </a>
+            <a href="{{ url_for('index') }}" class="btn btn-sm btn-outline-light header-btn">
+                <i class="bi bi-house me-1"></i> Home
+            </a>
+        </div>
+    </header>
 
-    <div class="row mt-4">
-        <div class="col-12">
-            {% if items|length == 0 %}
-                <div class="cart-table mt-4 empty-cart">
-                    Your cart is empty. Start adding items.
+    <!-- Main Container -->
+    <main class="container-fluid">
+        
+        {% if items|length == 0 %}
+            <!-- Empty Cart State -->
+            <div class="glass-panel empty-cart-card animate-fade-in mx-auto" style="max-width: 540px;">
+                <i class="bi bi-cart-x empty-icon"></i>
+                <h4 class="fw-bold mb-2">Your cart is empty</h4>
+                <p class="text-muted fs-7 mb-4">Looks like you haven't added anything to your cart yet.</p>
+                <a href="/" class="btn btn-primary btn-submit" style="display: inline-flex; width: auto; padding: 12px 28px;">
+                    <i class="bi bi-arrow-left me-1"></i> Start Shopping
+                </a>
+            </div>
+        {% else %}
+            <!-- Active Cart & Checkout Grid -->
+            <div class="row g-4">
+                
+                <!-- Left Column: Cart Items Table -->
+                <div class="col-12 col-lg-7">
+                    <div class="glass-panel animate-fade-in h-100">
+                        <div class="section-title">
+                            <i class="bi bi-bag-check text-indigo"></i>
+                            Order Items ({{ items|length }})
+                        </div>
+
+                        <div class="cart-table-wrapper">
+                            <table class="custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th class="text-center">Price</th>
+                                        <th class="text-center">Quantity</th>
+                                        <th class="text-end">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cart-body">
+                                    {% for item in items %}
+                                    <tr id="row-{{ item[0] }}" data-item-id="{{ item[0] }}" data-price="{{ item[2] }}">
+                                        <td>
+                                            <span class="fw-semibold">{{ item[1] }}</span>
+                                        </td>
+                                        <td class="text-center text-muted">
+                                            ₹<span class="unit-price">{{ "%.2f"|format(item[2]) }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="qty-controls">
+                                                <button class="qty-btn btn-minus update-cart" data-id="{{ item[0] }}" data-action="remove" title="Decrease">−</button>
+                                                <span class="qty-display" id="qty-{{ item[0] }}">{{ item[3] }}</span>
+                                                <button class="qty-btn btn-plus update-cart" data-id="{{ item[0] }}" data-action="add" title="Increase">+</button>
+                                            </div>
+                                        </td>
+                                        <td class="text-end fw-bold">
+                                            ₹<span class="row-total" id="total-{{ item[0] }}">{{ "%.2f"|format(item[2] * item[3]) }}</span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-3 text-end d-block d-sm-none">
+                            <a href="/" class="text-muted text-decoration-none fs-7">
+                                <i class="bi bi-plus-circle me-1"></i> Add more items
+                            </a>
+                        </div>
+                    </div>
                 </div>
-            {% else %}
-            <!-- Cart Table -->
-            <div class="cart-table mt-4">
-                <table class="table mb-0">
-                    <thead class="table-success">
-                        <tr>
-                            <th>Item</th>
-                            <th>Price</th>
-                            <th style="min-width:260px;">Quantity</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody id="cart-body">
-                        {% for item in items %}
-                        <tr id="row-{{ item[0] }}" data-item-id="{{ item[0] }}" data-price="{{ item[2] }}">
-                            <td class="align-middle">{{ item[1] }}</td>
-                            <td class="align-middle">₹<span class="unit-price">{{ "%.2f"|format(item[2]) }}</span></td>
-                            <td class="align-middle">
-                                <div class="qty-controls">
-                                    <button class="btn btn-danger qty-btn update-cart" data-id="{{ item[0] }}" data-action="remove">−</button>
-                                    <div class="qty-display" id="qty-{{ item[0] }}">{{ item[3] }}</div>
-                                    <button class="btn btn-success qty-btn update-cart" data-id="{{ item[0] }}" data-action="add">+</button>
+
+                <!-- Right Column: Delivery Details & Payment Summary -->
+                <div class="col-12 col-lg-5">
+                    <div class="glass-panel animate-fade-in">
+                        
+                        <!-- Order Summary -->
+                        <div class="section-title">
+                            <i class="bi bi-receipt text-indigo"></i>
+                            Payment Summary
+                        </div>
+
+                        <div class="summary-card">
+                            <div class="summary-row">
+                                <span>Items Subtotal</span>
+                                <span>₹<span id="grand-total">0.00</span></span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Delivery Fee</span>
+                                <span>₹<span id="delivery-fee">0.00</span></span>
+                            </div>
+                            <div class="summary-row total-row">
+                                <span>Total Payable</span>
+                                <span>₹<span id="payable-total">0.00</span></span>
+                            </div>
+
+                            <div class="free-delivery-badge" id="delivery-note">
+                                Calculating delivery...
+                            </div>
+                        </div>
+
+                        <!-- Checkout Form -->
+                        <div class="section-title">
+                            <i class="bi bi-truck text-indigo"></i>
+                            Delivery Details
+                        </div>
+
+                        <form action="{{ url_for('place_order') }}" method="POST" id="checkoutForm">
+                            
+                            <!-- Full Name -->
+                            <div class="mb-3">
+                                <label class="form-label">Full Name *</label>
+                                <div class="input-group-custom">
+                                    <i class="bi bi-person icon-prefix"></i>
+                                    <input type="text" name="name" class="form-control-custom" placeholder="e.g. John Doe" required>
                                 </div>
-                            </td>
-                            <td class="align-middle">₹<span class="row-total" id="total-{{ item[0] }}">{{ "%.2f"|format(item[2] * item[3]) }}</span></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                            </div>
 
-            <!-- Totals and Delivery -->
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mt-3">
-                <div class="w-100 w-md-50">
-                    <div class="total-box">
-                        Subtotal: ₹<span id="grand-total">0.00</span><br>
-                        Delivery: ₹<span id="delivery-fee">0.00</span><br>
-                        <strong>Payable: ₹<span id="payable-total">0.00</span></strong>
-                        <div class="delivery-note" id="delivery-note"></div>
+                            <!-- Mobile & WhatsApp Numbers -->
+                            <div class="row g-2 mb-3">
+                                <div class="col-12 col-sm-6">
+                                    <label class="form-label">Mobile Number *</label>
+                                    <div class="input-group-custom">
+                                        <i class="bi bi-telephone icon-prefix"></i>
+                                        <input type="tel" id="mobileNumber" name="mobile" class="form-control-custom" placeholder="10-digit number" pattern="[0-9]{10}" required>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <label class="form-label">WhatsApp Number</label>
+                                    </div>
+                                    <div class="input-group-custom">
+                                        <i class="bi bi-whatsapp icon-prefix"></i>
+                                        <input type="tel" id="whatsappNumber" name="whatsapp" class="form-control-custom" placeholder="Optional">
+                                    </div>
+                                </div>
+                                <div class="col-12 mt-1">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="sameAsMobile">
+                                        <label class="form-check-label" for="sameAsMobile">
+                                            Same as mobile number
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- House / Landmark Field -->
+                            <div class="mb-3">
+                                <label class="form-label">Flat / House No. / Building / Landmark *</label>
+                                <div class="input-group-custom">
+                                    <i class="bi bi-building icon-prefix"></i>
+                                    <input type="text" name="house_landmark" class="form-control-custom" placeholder="e.g. Flat 302, Green Acres, Near City Mall" required>
+                                </div>
+                            </div>
+
+                            <!-- Street Address / Area -->
+                            <div class="mb-3">
+                                <label class="form-label">Street Address / Area *</label>
+                                <div class="input-group-custom">
+                                    <i class="bi bi-geo-alt icon-prefix"></i>
+                                    <input type="text" id="address" name="address" class="form-control-custom" placeholder="Street, Locality, City, Pincode" required>
+                                </div>
+                                
+                                <button type="button" class="location-btn" id="locationBtn" onclick="useMyLocation()">
+                                    <i class="bi bi-crosshair"></i> Auto-Detect My Location
+                                </button>
+                            </div>
+
+                            <!-- Hidden field for server-side delivery fee -->
+                            <input type="hidden" name="delivery_fee" id="delivery_fee_input" value="0">
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn-submit mt-4">
+                                <i class="bi bi-check-circle-fill"></i> Place Order Now
+                            </button>
+                        </form>
+
                     </div>
                 </div>
 
-                <!-- Checkout Form -->
-                <div class="w-100 w-md-50">
-                    <form action="{{ url_for('place_order') }}" method="POST" class="checkout-form">
-                        <input type="text" name="name" placeholder="Your Name" class="form-control mb-3" required>
-                        <input type="text" id="address" name="address" placeholder="Address" class="form-control mb-3" required>
-                        <input type="text" name="mobile" placeholder="Mobile Number" class="form-control mb-3" required>
-                        <!-- hidden field to send delivery fee to server if needed -->
-                        <input type="hidden" name="delivery_fee" id="delivery_fee_input" value="0">
-                        <button type="submit" class="btn btn-primary w-100">✅ Place Order</button>
-                    </form>
-                    <div class="text-center mt-2">
-                        <button type="button" class="btn btn-outline-info" onclick="useMyLocation()">📍 Use My Location</button>
-                    </div>
-                </div>
             </div>
-            {% endif %}
-        </div>
-    </div>
+        {% endif %}
+
+    </main>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Delivery rules
+        // Delivery Calculation Rules
         const FREE_DELIVERY_THRESHOLD = 150;
         const DELIVERY_FEE = 30;
 
-        // Initialize totals on page load
+        // Recalculate Totals & Delivery Logic
         function recalcTotals() {
             let grand = 0;
             document.querySelectorAll('.row-total').forEach(el => {
                 const val = parseFloat(el.innerText.replace(/,/g, '')) || 0;
                 grand += val;
             });
+            
             grand = Math.round((grand + Number.EPSILON) * 100) / 100;
-            document.getElementById('grand-total').innerText = grand.toFixed(2);
+            const grandTotalEl = document.getElementById('grand-total');
+            if (grandTotalEl) grandTotalEl.innerText = grand.toFixed(2);
 
             let delivery = 0;
             let note = '';
+
             if (grand > 0 && grand < FREE_DELIVERY_THRESHOLD) {
                 delivery = DELIVERY_FEE;
                 const remaining = Math.max(0, FREE_DELIVERY_THRESHOLD - grand);
-                note = `Add ₹${remaining.toFixed(2)} more for free delivery`;
+                note = `<i class="bi bi-info-circle me-1"></i> Add ₹${remaining.toFixed(2)} more for FREE Delivery!`;
             } else {
                 delivery = 0;
-                if (grand === 0) note = '';
-                else note = 'You have free delivery';
+                if (grand === 0) {
+                    note = 'Cart is empty';
+                } else {
+                    note = '<i class="bi bi-truck me-1"></i> 🎉 You unlocked FREE Delivery!';
+                }
             }
 
             const payable = Math.round((grand + delivery + Number.EPSILON) * 100) / 100;
-            document.getElementById('delivery-fee').innerText = delivery.toFixed(2);
-            document.getElementById('payable-total').innerText = payable.toFixed(2);
-            document.getElementById('delivery-note').innerText = note;
-            document.getElementById('delivery_fee_input').value = delivery;
+            
+            const deliveryFeeEl = document.getElementById('delivery-fee');
+            const payableTotalEl = document.getElementById('payable-total');
+            const deliveryNoteEl = document.getElementById('delivery-note');
+            const deliveryFeeInput = document.getElementById('delivery_fee_input');
+
+            if (deliveryFeeEl) deliveryFeeEl.innerText = delivery.toFixed(2);
+            if (payableTotalEl) payableTotalEl.innerText = payable.toFixed(2);
+            if (deliveryNoteEl) deliveryNoteEl.innerHTML = note;
+            if (deliveryFeeInput) deliveryFeeInput.value = delivery;
         }
 
-        // Call recalc on load
+        // Initialize calculation on page load
         recalcTotals();
 
-        // Attach listeners to + / - buttons
+        // AJAX Cart Updates (+ / - Buttons)
         document.querySelectorAll('.update-cart').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 const itemId = this.dataset.id;
                 const action = this.dataset.action;
+
                 fetch(`/update_cart/${itemId}/${action}`)
                     .then(resp => resp.json())
                     .then(data => {
                         const qtyEl = document.getElementById(`qty-${data.item_id}`);
                         const rowTotalEl = document.getElementById(`total-${data.item_id}`);
+
                         if (!qtyEl || !rowTotalEl) {
-                            // If row not found, recalc and return
                             recalcTotals();
                             return;
                         }
 
-                        // Update quantity display
+                        // Update Quantity & Subtotal
                         qtyEl.innerText = data.qty;
-
-                        // Update row total
                         rowTotalEl.innerText = (Math.round((data.subtotal + Number.EPSILON) * 100) / 100).toFixed(2);
 
-                        // If qty is zero, remove the row
+                        // If quantity reaches zero, remove row with animation
                         if (data.qty === 0) {
                             const row = document.getElementById(`row-${data.item_id}`);
-                            if (row) row.remove();
-                        }
-
-                        // Recalculate totals
-                        recalcTotals();
-
-                        // If cart becomes empty, optionally reload to show empty message
-                        const anyRows = document.querySelectorAll('#cart-body tr').length;
-                        if (anyRows === 0) {
-                            // reload page to show empty cart UI (server-side template)
-                            location.reload();
+                            if (row) {
+                                row.style.transition = 'all 0.3s ease';
+                                row.style.opacity = '0';
+                                row.style.transform = 'translateX(-10px)';
+                                setTimeout(() => {
+                                    row.remove();
+                                    recalcTotals();
+                                    if (document.querySelectorAll('#cart-body tr').length === 0) {
+                                        location.reload();
+                                    }
+                                }, 300);
+                            }
+                        } else {
+                            recalcTotals();
                         }
                     })
                     .catch(err => {
                         console.error('Update cart error', err);
-                        alert('Could not update cart. Try again.');
+                        alert('Could not update cart. Please try again.');
                     });
             });
         });
 
-        // Geolocation + reverse geocode using Google Maps Geocoding API
-        // Replace YOUR_API_KEY with your Google Maps Geocoding API key if you want reverse geocoding.
+        // WhatsApp Same as Mobile Checkbox Sync
+        const mobileInput = document.getElementById('mobileNumber');
+        const whatsappInput = document.getElementById('whatsappNumber');
+        const sameAsMobileCheckbox = document.getElementById('sameAsMobile');
+
+        if (sameAsMobileCheckbox && mobileInput && whatsappInput) {
+            sameAsMobileCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    whatsappInput.value = mobileInput.value;
+                    whatsappInput.readOnly = true;
+                } else {
+                    whatsappInput.readOnly = false;
+                }
+            });
+
+            mobileInput.addEventListener('input', function() {
+                if (sameAsMobileCheckbox.checked) {
+                    whatsappInput.value = this.value;
+                }
+            });
+        }
+
+        // Automatic Geolocation & Free Reverse Geocoding via OpenStreetMap (Nominatim)
         function useMyLocation() {
+            const locBtn = document.getElementById('locationBtn');
+            const addressInput = document.getElementById('address');
+
             if (!navigator.geolocation) {
                 alert('Geolocation is not supported by your browser.');
                 return;
             }
-            navigator.geolocation.getCurrentPosition(async (pos) => {
-                const lat = pos.coords.latitude;
-                const lon = pos.coords.longitude;
 
-                // Try to reverse geocode using Google Geocoding API if API key provided
-                const API_KEY = ''; // <-- optional: put your Google Geocoding API key here
-                if (!API_KEY) {
-                    // If no API key, just fill lat/lon as address fallback
-                    document.getElementById('address').value = `Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)}`;
-                    return;
-                }
+            // Show Loading State
+            const originalBtnText = locBtn.innerHTML;
+            locBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Detecting location...`;
+            locBtn.disabled = true;
 
-                try {
-                    const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${API_KEY}`);
-                    const data = await res.json();
-                    if (data && data.results && data.results[0]) {
-                        document.getElementById('address').value = data.results[0].formatted_address;
-                    } else {
-                        document.getElementById('address').value = `Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)}`;
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+
+                    try {
+                        // 1. Try Free OpenStreetMap Nominatim Reverse Geocoding API
+                        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+                        const data = await res.json();
+
+                        if (data && data.address) {
+                            const addr = data.address;
+                            // Format clean address: Road, Suburb/Neighbourhood, City, State, Postcode
+                            const components = [
+                                addr.road || addr.pedestrian || addr.suburb,
+                                addr.neighbourhood || addr.residential,
+                                addr.city || addr.town || addr.village,
+                                addr.state_district || addr.state,
+                                addr.postcode
+                            ].filter(Boolean);
+
+                            addressInput.value = components.length > 0 ? components.join(', ') : data.display_name;
+                        } else {
+                            addressInput.value = `Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)}`;
+                        }
+                    } catch (e) {
+                        console.error('Reverse Geocoding error:', e);
+                        addressInput.value = `Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)}`;
+                    } finally {
+                        // Reset Button State
+                        locBtn.innerHTML = `<i class="bi bi-check-circle-fill text-success"></i> Location Auto-Filled`;
+                        locBtn.disabled = false;
+                        setTimeout(() => { locBtn.innerHTML = originalBtnText; }, 3000);
                     }
-                } catch (e) {
-                    console.error(e);
-                    document.getElementById('address').value = `Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)}`;
-                }
-            }, (err) => {
-                if (err.code === err.PERMISSION_DENIED) {
-                    alert('Permission denied. Please allow location access in your browser.');
-                } else {
-                    alert('Could not get your location. Try again.');
-                }
-            }, { enableHighAccuracy: true, timeout: 10000 });
+                },
+                (err) => {
+                    locBtn.innerHTML = originalBtnText;
+                    locBtn.disabled = false;
+                    if (err.code === err.PERMISSION_DENIED) {
+                        alert('Location access was denied. Please allow location permissions in your browser settings.');
+                    } else {
+                        alert('Could not retrieve location. Please type your address manually.');
+                    }
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
         }
     </script>
 </body>
