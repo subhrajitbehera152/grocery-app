@@ -57,6 +57,8 @@ def index():
 
 @app.route("/location/<int:loc_id>")
 def location(loc_id):
+    search_query = request.args.get("q", "").lower()
+
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
     c.execute("""SELECT items.id, items.name, items.category, items.price, items.photo
@@ -66,13 +68,18 @@ def location(loc_id):
     items = c.fetchall()
     conn.close()
 
+    # 🔍 Filter items by search query (name or category)
+    if search_query:
+        items = [item for item in items if search_query in item[1].lower() or search_query in item[2].lower()]
+
     categories = {}
     for item in items:
         cat = item[2]
         if cat not in categories:
             categories[cat] = []
         categories[cat].append(item)
-    return render_template("items.html", categories=categories)
+
+    return render_template("items.html", categories=categories, search_query=search_query, loc_id=loc_id)
 
 # --- Cart Routes ---
 @app.route("/update_cart/<int:item_id>/<action>")
