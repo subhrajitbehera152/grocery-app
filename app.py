@@ -386,7 +386,14 @@ def place_order():
 
     customer_name = request.form.get("name", "").strip()
     customer_address = request.form.get("address", "").strip()
+    house_landmark = request.form.get("house_landmark", "").strip()
     mobile = request.form.get("mobile", "").strip()
+
+    # Combine the house/landmark and street address because the
+    # existing orders table has one customer_address column.
+    full_address = ", ".join(
+        part for part in (house_landmark, customer_address) if part
+    )
 
     cart = session.get("cart")
 
@@ -395,6 +402,7 @@ def place_order():
         or not cart
         or not customer_name
         or not customer_address
+        or not house_landmark
     ):
         return redirect(url_for("view_cart"))
 
@@ -446,7 +454,7 @@ def place_order():
             VALUES (?, ?, ?, ?, 'Pending')
         """, (
             customer_name,
-            customer_address,
+            full_address,
             mobile,
             order_date
         ))
@@ -479,15 +487,127 @@ def place_order():
 
     session["cart"] = {}
 
+    # Redirect to the tracking page instead of the plain-text
+    # order-success message.
     return redirect(
-        url_for("order_success", order_id=order_id)
+        url_for("track_order", order_id=order_id)
     )
 
 
+# -----------------------
+# Order Tracking
+# -----------------------
+
+@app.route("/track/<int:order_id>")
+def track_order(order_id):
+
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    # Retrieve the order using the existing database columns.
+    c.execute("""
+        SELECT
+            id,
+            customer_name,
+            customer_address,
+            mobile,
+            date,
+            COALESCE(status, 'Pending')
+        FROM orders
+        WHERE id = ?
+    """, (order_id,))
+
+    order_row = c.fetchone()
+
+    if not order_row:
+        conn.close()
+        return "Order not found", 404
+
+    # Retrieve ordered products and their prices.
+    c.execute("""
+        SELECT
+            COALESCE(items.name, 'Deleted item'),
+            order_items.quantity,
+            COALESCE(items.price, 0),
+            COALESCE(order_items.quantity * items.price, 0)
+        FROM order_items
+        LEFT JOIN items
+            ON order_items.item_id = items.id
+        WHERE order_items.order_id = ?
+        ORDER BY order_items.id
+    """, (order_id,))
+
+    item_rows = c.fetchall()
+
+    conn.close()
+
+    # Convert database tuples to dictionaries expected by track.html.
+    items = [
+        {
+            "name": row[0],
+            "quantity": row[1],
+            "price": row[2],
+            "subtotal": row[3]
+        }
+        for row in item_rows
+    ]
+
+    subtotal = sum(item["subtotal"] or 0 for item in items)
+
+    # This app's current schema does not store a delivery fee.
+    # The cart page currently uses ₹30 below ₹150 and free delivery
+    # at/above ₹150, so calculate the displayed fee using that rule.
+    delivery_fee = 30 if 0 < subtotal < 150 else 0
+    total = subtotal + delivery_fee
+
+    # Adapt the app's existing status values to the labels used
+    # by the tracking page's progress display.
+    status = order_row[5]
+
+    if status == "Pending":
+        display_status = "Order Placed"
+    elif status == "In Progress":
+        display_status = "Preparing"
+    elif status == "Completed":
+        display_status = "Delivered"
+    else:
+        display_status = status
+
+    order = {
+        "id": order_row[0],
+        "order_number": order_row[0],
+        "name": order_row[1],
+        "house_landmark": "",
+        "address": order_row[2],
+        "mobile": order_row[3],
+        "date": order_row[4],
+        "status": display_status,
+        "subtotal": subtotal,
+        "delivery_fee": delivery_fee,
+        "total": total,
+        "payment_method": "Not specified"
+    }
+
+    # Partner details are not stored in the current database.
+    # track.html will display its unavailable/not-assigned state.
+    partner = None
+
+    return render_template(
+        "track.html",
+        order=order,
+        items=items,
+        partner=partner
+    )
+
+
+# Keep the old order-success URL working, but send customers
+# to the new tracking page instead of showing plain text.
 @app.route("/order_success/<int:order_id>")
 def order_success(order_id):
 
-    return f"Order #{order_id} placed successfully!"
+    return redirect(
+        url_for("track_order", order_id=order_id)
+    )
 
 
 # -----------------------

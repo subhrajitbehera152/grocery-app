@@ -1,6 +1,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,7 +26,9 @@
             --radius: 22px;
         }
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             margin: 0;
@@ -68,8 +71,12 @@
         }
 
         @keyframes float {
-            from { transform: translate(0, 0) scale(1); }
-            to { transform: translate(35px, -25px) scale(1.12); }
+            from {
+                transform: translate(0, 0) scale(1);
+            }
+            to {
+                transform: translate(35px, -25px) scale(1.12);
+            }
         }
 
         .topbar {
@@ -123,7 +130,7 @@
         }
 
         .top-actions a:hover {
-            background: rgba(255,255,255,.09);
+            background: rgba(255, 255, 255, .09);
             transform: translateY(-2px);
         }
 
@@ -167,15 +174,23 @@
             border-radius: var(--radius);
             padding: 25px;
             backdrop-filter: blur(18px);
-            box-shadow: 0 24px 60px rgba(0,0,0,.24);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, .24);
             animation: enter .6s ease both;
         }
 
-        .panel + .panel { margin-top: 22px; }
+        .panel + .panel {
+            margin-top: 22px;
+        }
 
         @keyframes enter {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .panel-title {
@@ -187,7 +202,10 @@
             margin-bottom: 20px;
         }
 
-        .panel-title i { color: var(--primary); font-size: 1.2rem; }
+        .panel-title i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
 
         .order-banner {
             display: flex;
@@ -196,9 +214,9 @@
             flex-wrap: wrap;
             gap: 18px;
             padding: 21px;
-            border: 1px solid rgba(129,140,248,.2);
+            border: 1px solid rgba(129, 140, 248, .2);
             border-radius: 17px;
-            background: linear-gradient(120deg, rgba(99,102,241,.13), rgba(16,185,129,.06));
+            background: linear-gradient(120deg, rgba(99, 102, 241, .13), rgba(16, 185, 129, .06));
             margin-bottom: 25px;
         }
 
@@ -221,9 +239,9 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(16,185,129,.13);
+            background: rgba(16, 185, 129, .13);
             color: #6ee7b7;
-            border: 1px solid rgba(16,185,129,.25);
+            border: 1px solid rgba(16, 185, 129, .25);
             padding: 9px 13px;
             border-radius: 999px;
             font-size: .8rem;
@@ -240,7 +258,10 @@
         }
 
         @keyframes blink {
-            50% { opacity: .35; transform: scale(.8); }
+            50% {
+                opacity: .35;
+                transform: scale(.8);
+            }
         }
 
         .progress-track {
@@ -265,7 +286,7 @@
             width: calc(100% - 48px);
             left: calc(50% + 24px);
             top: 20px;
-            background: rgba(255,255,255,.1);
+            background: rgba(255, 255, 255, .1);
             border-radius: 4px;
         }
 
@@ -280,36 +301,44 @@
             display: grid;
             place-items: center;
             border-radius: 50%;
-            background: rgba(255,255,255,.055);
+            background: rgba(255, 255, 255, .055);
             border: 1px solid var(--border);
             font-size: 1rem;
         }
 
-        .progress-step.complete { color: #6ee7b7; }
+        .progress-step.complete {
+            color: #6ee7b7;
+        }
+
         .progress-step.complete .step-icon {
             color: #052e24;
             background: var(--green);
             border-color: var(--green);
-            box-shadow: 0 0 22px rgba(16,185,129,.17);
+            box-shadow: 0 0 22px rgba(16, 185, 129, .17);
         }
 
-        .progress-step.current { color: var(--white); }
+        .progress-step.current {
+            color: var(--white);
+        }
+
         .progress-step.current .step-icon {
             color: white;
             background: #6366f1;
             border-color: #818cf8;
-            box-shadow: 0 0 0 6px rgba(99,102,241,.13);
+            box-shadow: 0 0 0 6px rgba(99, 102, 241, .13);
             animation: currentPulse 2s infinite;
         }
 
         @keyframes currentPulse {
-            50% { box-shadow: 0 0 0 10px rgba(99,102,241,.04); }
+            50% {
+                box-shadow: 0 0 0 10px rgba(99, 102, 241, .04);
+            }
         }
 
         .status-message {
             padding: 15px 17px;
             border-radius: 14px;
-            background: rgba(255,255,255,.035);
+            background: rgba(255, 255, 255, .035);
             border: 1px solid var(--border);
             color: #cbd5e1;
             font-size: .9rem;
@@ -361,15 +390,24 @@
 
         .items-table td {
             padding: 15px 8px;
-            border-bottom: 1px solid rgba(255,255,255,.055);
+            border-bottom: 1px solid rgba(255, 255, 255, .055);
             font-size: .88rem;
             vertical-align: middle;
         }
 
-        .items-table tr:last-child td { border-bottom: 0; }
+        .items-table tr:last-child td {
+            border-bottom: 0;
+        }
 
-        .item-name { font-weight: 700; }
-        .item-muted { color: var(--muted); font-size: .78rem; margin-top: 4px; }
+        .item-name {
+            font-weight: 700;
+        }
+
+        .item-muted {
+            color: var(--muted);
+            font-size: .78rem;
+            margin-top: 4px;
+        }
 
         .summary-line {
             display: flex;
@@ -380,10 +418,12 @@
             margin: 12px 0;
         }
 
-        .summary-line strong { color: var(--white); }
+        .summary-line strong {
+            color: var(--white);
+        }
 
         .summary-total {
-            border-top: 1px dashed rgba(255,255,255,.16);
+            border-top: 1px dashed rgba(255, 255, 255, .16);
             padding-top: 16px;
             margin-top: 17px;
             font-size: 1.05rem;
@@ -397,8 +437,8 @@
             gap: 16px;
             padding: 18px;
             border-radius: 16px;
-            border: 1px solid rgba(16,185,129,.2);
-            background: rgba(16,185,129,.055);
+            border: 1px solid rgba(16, 185, 129, .2);
+            background: rgba(16, 185, 129, .055);
         }
 
         .partner-avatar {
@@ -409,13 +449,25 @@
             place-items: center;
             border-radius: 18px;
             color: #d1fae5;
-            background: rgba(16,185,129,.16);
+            background: rgba(16, 185, 129, .16);
             font-size: 1.5rem;
         }
 
-        .partner-info { flex: 1; min-width: 0; }
-        .partner-name { font-weight: 800; font-size: 1rem; }
-        .partner-caption { color: var(--muted); font-size: .8rem; margin-top: 5px; }
+        .partner-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .partner-name {
+            font-weight: 800;
+            font-size: 1rem;
+        }
+
+        .partner-caption {
+            color: var(--muted);
+            font-size: .8rem;
+            margin-top: 5px;
+        }
 
         .call-button {
             display: inline-flex;
@@ -444,7 +496,7 @@
             border: 1px solid var(--border);
             border-radius: 16px;
             overflow: hidden;
-            background: rgba(255,255,255,.03);
+            background: rgba(255, 255, 255, .03);
         }
 
         .map-frame iframe {
@@ -463,12 +515,15 @@
             text-align: center;
             padding: 25px;
             color: var(--muted);
-            border: 1px dashed rgba(255,255,255,.15);
+            border: 1px dashed rgba(255, 255, 255, .15);
             border-radius: 16px;
-            background: rgba(255,255,255,.02);
+            background: rgba(255, 255, 255, .02);
         }
 
-        .map-placeholder i { font-size: 2rem; color: var(--primary); }
+        .map-placeholder i {
+            font-size: 2rem;
+            color: var(--primary);
+        }
 
         .bottom-actions {
             display: flex;
@@ -486,7 +541,7 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             color: var(--white);
-            background: rgba(255,255,255,.045);
+            background: rgba(255, 255, 255, .045);
             text-decoration: none;
             font-size: .86rem;
             font-weight: 700;
@@ -495,7 +550,7 @@
 
         .action-button:hover {
             color: white;
-            background: rgba(255,255,255,.1);
+            background: rgba(255, 255, 255, .1);
             transform: translateY(-2px);
         }
 
@@ -506,30 +561,113 @@
             margin-top: 30px;
         }
 
+        /* WhatsApp Online Support */
+        .whatsapp-support {
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 20px;
+            border-radius: 50px;
+            background: #25D366;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 800;
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.35);
+            transition: 0.2s ease;
+        }
+
+        .whatsapp-support i {
+            font-size: 25px;
+        }
+
+        .whatsapp-support:hover {
+            background: #1ebe5d;
+            color: #ffffff;
+            transform: translateY(-3px);
+        }
+
         @media (max-width: 700px) {
-            .topbar { padding: 12px 16px; }
-            .brand { font-size: 1rem; }
-            .brand-icon { width: 38px; height: 38px; }
-            .top-actions a { padding: 8px 10px; font-size: .78rem; }
-            main { padding: 25px 13px 40px; }
-            .panel { padding: 17px; border-radius: 18px; }
-            .details-grid { grid-template-columns: 1fr; }
-            .progress-step { font-size: .66rem; }
-            .step-icon { width: 36px; height: 36px; }
+            .topbar {
+                padding: 12px 16px;
+            }
+
+            .brand {
+                font-size: 1rem;
+            }
+
+            .brand-icon {
+                width: 38px;
+                height: 38px;
+            }
+
+            .top-actions a {
+                padding: 8px 10px;
+                font-size: .78rem;
+            }
+
+            main {
+                padding: 25px 13px 40px;
+            }
+
+            .panel {
+                padding: 17px;
+                border-radius: 18px;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .progress-step {
+                font-size: .66rem;
+            }
+
+            .step-icon {
+                width: 36px;
+                height: 36px;
+            }
+
             .progress-step:not(:last-child)::after {
                 width: calc(100% - 40px);
                 left: calc(50% + 20px);
                 top: 17px;
             }
-            .partner-card { flex-wrap: wrap; }
-            .call-button { width: 100%; justify-content: center; }
-            .items-table th, .items-table td { padding: 12px 5px; font-size: .78rem; }
-            .map-frame { height: 250px; }
+
+            .partner-card {
+                flex-wrap: wrap;
+            }
+
+            .call-button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .items-table th,
+            .items-table td {
+                padding: 12px 5px;
+                font-size: .78rem;
+            }
+
+            .map-frame {
+                height: 250px;
+            }
+
+            .whatsapp-support {
+                right: 15px;
+                bottom: 15px;
+                padding: 13px 16px;
+            }
         }
     </style>
 </head>
 
 <body>
+
 <div class="ambient" aria-hidden="true">
     <div class="blob one"></div>
     <div class="blob two"></div>
@@ -540,6 +678,7 @@
         <span class="brand-icon"><i class="bi bi-basket2-fill"></i></span>
         <span>Order Tracking</span>
     </div>
+
     <nav class="top-actions">
         <a href="{{ url_for('index') }}"><i class="bi bi-house me-1"></i> Home</a>
         <a href="/"><i class="bi bi-bag me-1"></i> Shop</a>
@@ -547,6 +686,7 @@
 </header>
 
 <main>
+
     <div class="page-heading">
         <div class="eyebrow"><i class="bi bi-stars me-1"></i> Your order, your updates</div>
         <h1>Track your delivery</h1>
@@ -555,6 +695,7 @@
 
     {% set order_status = (order.status if order and order.status else 'Order Placed')|lower %}
     {% set current_step = 0 %}
+
     {% if 'confirm' in order_status or 'process' in order_status or 'prepar' in order_status %}
         {% set current_step = 1 %}
     {% elif 'ready' in order_status or 'picked' in order_status or 'transit' in order_status or 'ship' in order_status or 'out for delivery' in order_status %}
@@ -564,6 +705,7 @@
     {% endif %}
 
     <section class="panel">
+
         <div class="order-banner">
             <div>
                 <div class="order-label">Order number</div>
@@ -571,6 +713,7 @@
                     #{{ order.order_number if order and order.order_number else order.id if order and order.id else 'Not available' }}
                 </div>
             </div>
+
             <div class="status-pill">
                 <span class="status-dot"></span>
                 {{ order.status if order and order.status else 'Order Placed' }}
@@ -586,6 +729,7 @@
                 ('On the way', 'bi-bicycle'),
                 ('Delivered', 'bi-house-check')
             ] %}
+
             {% for step in steps %}
             <div class="progress-step {% if loop.index0 < current_step %}complete{% elif loop.index0 == current_step %}current{% endif %}">
                 <div class="step-icon">
@@ -615,11 +759,15 @@
                 Your order has been received. The next updates will appear here when your order status changes.
             {% endif %}
         </div>
+
     </section>
 
     <div class="row g-4 mt-1">
+
         <div class="col-12 col-lg-7">
+
             <section class="panel h-100">
+
                 <div class="panel-title"><i class="bi bi-bag-check"></i> Items in your order</div>
 
                 {% if items %}
@@ -633,6 +781,7 @@
                                 <th class="text-end">Total</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             {% for item in items %}
                             <tr>
@@ -641,12 +790,15 @@
                                         {{ item.name if item.name is defined else item[1] if item is sequence else 'Item' }}
                                     </div>
                                 </td>
+
                                 <td class="text-center">
                                     {{ item.quantity if item.quantity is defined else item.qty if item.qty is defined else item[3] if item is sequence else 1 }}
                                 </td>
+
                                 <td class="text-end">
                                     ₹{{ "%.2f"|format(item.price if item.price is defined else item[2] if item is sequence else 0) }}
                                 </td>
+
                                 <td class="text-end fw-bold">
                                     {% if item.subtotal is defined %}
                                         ₹{{ "%.2f"|format(item.subtotal) }}
@@ -673,65 +825,89 @@
                     <span>Items subtotal</span>
                     <strong>₹{{ "%.2f"|format(order.subtotal if order and order.subtotal is defined else 0) }}</strong>
                 </div>
+
                 <div class="summary-line">
                     <span>Delivery fee</span>
                     <strong>₹{{ "%.2f"|format(order.delivery_fee if order and order.delivery_fee is defined else 0) }}</strong>
                 </div>
+
                 <div class="summary-line summary-total">
                     <span>Total payable</span>
                     <strong>₹{{ "%.2f"|format(order.total if order and order.total is defined else 0) }}</strong>
                 </div>
+
                 <div class="summary-line">
                     <span>Payment method</span>
                     <strong>{{ order.payment_method if order and order.payment_method else 'Not specified' }}</strong>
                 </div>
+
             </section>
+
         </div>
 
         <div class="col-12 col-lg-5">
+
             <section class="panel">
+
                 <div class="panel-title"><i class="bi bi-geo-alt"></i> Delivery address</div>
 
                 <div class="details-grid">
+
                     <div class="detail-box">
                         <div class="detail-label"><i class="bi bi-person me-1"></i> Customer</div>
                         <div class="detail-value">{{ order.name if order and order.name else 'Not provided' }}</div>
                     </div>
+
                     <div class="detail-box">
                         <div class="detail-label"><i class="bi bi-telephone me-1"></i> Mobile</div>
                         <div class="detail-value">{{ order.mobile if order and order.mobile else 'Not provided' }}</div>
                     </div>
+
                     <div class="detail-box" style="grid-column: 1 / -1;">
                         <div class="detail-label"><i class="bi bi-pin-map me-1"></i> Address</div>
                         <div class="detail-value">
                             {{ order.house_landmark if order and order.house_landmark else '' }}
-                            {% if order and order.address %}<br>{{ order.address }}{% endif %}
-                            {% if not order or (not order.house_landmark and not order.address) %}Not provided{% endif %}
+
+                            {% if order and order.address %}
+                                <br>{{ order.address }}
+                            {% endif %}
+
+                            {% if not order or (not order.house_landmark and not order.address) %}
+                                Not provided
+                            {% endif %}
                         </div>
                     </div>
+
                 </div>
+
             </section>
 
             <section class="panel">
+
                 <div class="panel-title"><i class="bi bi-person-badge"></i> Delivery partner</div>
 
                 {% if partner and partner.name %}
                 <div class="partner-card">
+
                     <div class="partner-avatar"><i class="bi bi-person-fill"></i></div>
+
                     <div class="partner-info">
                         <div class="partner-name">{{ partner.name }}</div>
                         <div class="partner-caption">Your assigned delivery partner</div>
+
                         {% if partner.phone %}
                         <div class="partner-caption mt-2">
                             <i class="bi bi-telephone me-1"></i>{{ partner.phone }}
                         </div>
                         {% endif %}
                     </div>
+
                     {% if partner.phone %}
                     <a class="call-button" href="tel:{{ partner.phone }}">
                         <i class="bi bi-telephone-fill"></i> Call partner
                     </a>
                     {% endif %}
+
                 </div>
                 {% else %}
                 <div class="status-message">
@@ -739,9 +915,11 @@
                     A delivery partner has not been assigned or their details are not available yet.
                 </div>
                 {% endif %}
+
             </section>
 
             <section class="panel">
+
                 <div class="panel-title"><i class="bi bi-map"></i> Partner location</div>
 
                 {% if partner and partner.latitude is defined and partner.longitude is defined and partner.latitude is not none and partner.longitude is not none %}
@@ -753,11 +931,13 @@
                         src="https://www.openstreetmap.org/export/embed.html?bbox={{ partner.longitude - 0.01 }}%2C{{ partner.latitude - 0.01 }}%2C{{ partner.longitude + 0.01 }}%2C{{ partner.latitude + 0.01 }}&layer=mapnik&marker={{ partner.latitude }}%2C{{ partner.longitude }}">
                     </iframe>
                 </div>
+
                 <div class="partner-caption mt-3">
                     <i class="bi bi-geo me-1"></i>
                     Map position is based on the latest coordinates supplied by your delivery system.
+
                     {% if partner.last_updated %}
-                    <br>Last updated: {{ partner.last_updated }}
+                        <br>Last updated: {{ partner.last_updated }}
                     {% endif %}
                 </div>
                 {% else %}
@@ -767,22 +947,60 @@
                     <span>When your delivery system supplies the partner’s GPS coordinates, their map position can appear here.</span>
                 </div>
                 {% endif %}
+
             </section>
+
         </div>
+
     </div>
 
     <div class="bottom-actions">
         <a class="action-button" href="{{ url_for('index') }}">
             <i class="bi bi-arrow-left"></i> Continue shopping
         </a>
+
         <a class="action-button" href="/">
             <i class="bi bi-shop"></i> Back to store
         </a>
     </div>
 
     <div class="footer-note">
-        Need help with your order? Please contact your store’s support team.
+        Need help with your order? Please contact support team +917848988073.
     </div>
+
 </main>
+
+<!-- WhatsApp Online Support Button -->
+
+{% set wa_order_number = order.order_number if order and order.order_number else order.id if order and order.id else 'Not available' %}
+{% set wa_total = order.total if order and order.total is defined else 0 %}
+{% set wa_tracking_link = request.url %}
+{% set wa_items = namespace(details='') %}
+
+{% if items %}
+    {% for item in items %}
+        {% set wa_item_name = item.name if item.name is defined else item[1] if item is sequence else 'Item' %}
+        {% set wa_item_qty = item.quantity if item.quantity is defined else item.qty if item.qty is defined else item[3] if item is sequence else 1 %}
+        {% set wa_item_price = item.price if item.price is defined else item[2] if item is sequence else 0 %}
+        {% set wa_item_total = item.subtotal if item.subtotal is defined else (wa_item_price|float * wa_item_qty|float) %}
+        {% set wa_items.details = wa_items.details ~ '\n- ' ~ wa_item_name ~ ' x ' ~ wa_item_qty ~ ' (₹' ~ ('%.2f'|format(wa_item_total|float)) ~ ')' %}
+    {% endfor %}
+{% else %}
+    {% set wa_items.details = '\nItem details not available' %}
+{% endif %}
+
+{% set wa_message = 'Hello, I need help with my order.\n\nOrder Number: #' ~ wa_order_number ~ '\n\nItems:' ~ wa_items.details ~ '\n\nTotal Cost: ₹' ~ ('%.2f'|format(wa_total|float)) ~ '\n\nTrack my order: ' ~ wa_tracking_link %}
+
+<a
+    href="https://wa.me/917848988073?text={{ wa_message|urlencode }}"
+    class="whatsapp-support"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Contact online support on WhatsApp">
+
+    <i class="bi bi-whatsapp"></i>
+    <span>Online Support</span>
+</a>
+
 </body>
 </html>
