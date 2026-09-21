@@ -321,6 +321,15 @@
     }
     .toast-notice.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
 
+    .product.is-out-of-stock { opacity: .78; }
+    .product.is-out-of-stock .media img { filter: grayscale(1); }
+    .stock-overlay {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: rgba(15, 23, 42, .62); color: #fff; font-weight: 800; font-size: 1rem;
+      letter-spacing: .04em; text-transform: uppercase; z-index: 2;
+    }
+    .add-btn:disabled, .qty button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
     /* Responsive Adjustments */
     @media (max-width: 992px) {
       .container-main { grid-template-columns: 1fr; margin-top: 145px; padding: 0 16px; }
@@ -361,6 +370,129 @@
       
       .toast-notice { bottom: 80px; font-size: 0.8rem; padding: 10px 18px; }
     }
+
+    /* Enhanced polish: preserve the existing dark palette and gradient accents. */
+    :root { scroll-padding-top: 150px; }
+    body { overflow-x: hidden; }
+    button, a, input { touch-action: manipulation; }
+    a:focus-visible, button:focus-visible, input:focus-visible {
+      outline: 3px solid var(--accent-solid);
+      outline-offset: 3px;
+    }
+
+    .topbar { transition: background .25s ease, box-shadow .25s ease; }
+    .topbar:after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-solid), #ec4899, transparent);
+      opacity: .55; pointer-events: none;
+    }
+    .search-wrapper { min-width: 0; }
+    .search-input { min-height: 46px; }
+    .nav-btn, .category-pill, .add-btn, .checkout-btn, .mobile-checkout-btn {
+      -webkit-user-select: none; user-select: none;
+    }
+    .category-pill { min-height: 40px; }
+    .category-pill:active { transform: scale(.97); }
+
+    .product {
+      isolation: isolate;
+      transform: translateZ(0);
+      will-change: transform;
+    }
+    .product:before {
+      content: ""; position: absolute; inset: 0; border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(99,102,241,.35), transparent 42%, rgba(236,72,153,.22));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      opacity: 0; pointer-events: none; transition: opacity .3s ease; z-index: 1;
+    }
+    .product:hover:before, .product:focus-within:before { opacity: 1; }
+    .product .media { isolation: isolate; }
+    .product .media img { backface-visibility: hidden; }
+    .product .body { min-width: 0; }
+    .product .title, .product .meta {
+      overflow-wrap: anywhere;
+    }
+    .product .price { font-variant-numeric: tabular-nums; }
+    .qty button { min-width: 36px; min-height: 36px; }
+    .qty .count { font-variant-numeric: tabular-nums; }
+    .add-btn { min-height: 42px; justify-content: center; }
+    .checkout-btn, .mobile-checkout-btn { min-height: 46px; }
+    .checkout-btn:active, .mobile-checkout-btn:active, .add-btn:active {
+      transform: scale(.98);
+    }
+    .toast-notice { max-width: calc(100vw - 28px); text-align: center; }
+
+    /* Cards enter gently as they become visible. */
+    .product.motion-ready {
+      opacity: 0;
+      transform: translateY(16px) scale(.985);
+      transition: opacity .45s ease, transform .45s cubic-bezier(.2,.75,.25,1),
+                  border-color .3s ease, box-shadow .3s ease;
+    }
+    .product.motion-ready.is-visible { opacity: 1; transform: translateY(0) scale(1); }
+    .product.motion-ready.is-visible:hover { transform: translateY(-5px) scale(1.005); }
+
+    @media (min-width: 993px) {
+      .items-panel { overscroll-behavior: contain; }
+      .summary { transition: border-color .25s ease, box-shadow .25s ease; }
+      .summary:hover { border-color: var(--border-highlight); }
+    }
+    @media (max-width: 992px) {
+      .container-main { gap: 18px; }
+      .items-panel { -webkit-overflow-scrolling: touch; }
+      .mobile-cart-bar { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+    }
+    @media (max-width: 576px) {
+      body { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+      .topbar { gap: 9px; }
+      .brand { min-width: 0; gap: 10px; }
+      .brand > div:last-child { min-width: 0; }
+      .brand .subtitle { font-size: .7rem; }
+      .top-controls { gap: 7px; }
+      .top-controls form { min-width: 0; }
+      .search-input { min-height: 44px; }
+      .nav-btn { min-height: 42px; white-space: nowrap; }
+      .category-bar { padding-top: 9px; padding-bottom: 9px; }
+      .category-list { margin: 0; gap: 8px; }
+      .category-pill { min-height: 40px; padding: 7px 13px; }
+      .container-main { margin-top: 170px; }
+      .grid { align-items: stretch; }
+      .product { min-width: 0; }
+      .product .media { height: clamp(100px, 29vw, 145px); }
+      .product .body { padding: 10px; }
+      .product .title { font-size: .86rem; line-height: 1.35; }
+      .product .meta { font-size: .72rem; line-height: 1.35; }
+      .product .price { font-size: 1rem; }
+      .controls { margin-top: 6px; }
+      .qty { min-height: 40px; }
+      .qty button { min-width: 34px; min-height: 34px; }
+      .add-btn { min-height: 42px; }
+      .mobile-cart-bar { gap: 8px; }
+      .mobile-cart-total { font-size: 1.08rem; }
+      .mobile-checkout-btn { padding: 10px 13px; white-space: nowrap; }
+      .toast-notice { bottom: calc(82px + env(safe-area-inset-bottom)); }
+    }
+    @media (max-width: 360px) {
+      .brand .subtitle { display: none; }
+      .nav-btn { padding: 8px 10px; }
+      .grid { gap: 8px; }
+      .product .body { padding: 8px; }
+      .qty { gap: 2px; }
+      .qty button { min-width: 30px; }
+      .mobile-checkout-btn { font-size: .82rem; padding-inline: 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+      .product.motion-ready { opacity: 1; transform: none; }
+    }
+
   </style>
 </head>
 <body>
@@ -407,9 +539,10 @@
           </div>
           <div class="grid role-list mb-4">
             {% for item in items %}
-            <article class="product" id="product-{{ item[0] }}" data-id="{{ item[0] }}" data-price="{{ item[3] }}">
+            <article class="product {% if item[5] %}is-out-of-stock{% endif %}" id="product-{{ item[0] }}" data-id="{{ item[0] }}" data-price="{{ item[3] }}" data-out-of-stock="{{ 1 if item[5] else 0 }}">
               <div class="media">
                 <img loading="lazy" src="{{ item[4] or 'https://via.placeholder.com/600x360.png?text=' ~ item[1] }}" alt="{{ item[1] }}">
+                {% if item[5] %}<div class="stock-overlay">Out of Stock</div>{% endif %}
               </div>
               <div class="body">
                 <div class="title">{{ item[1] }}</div>
@@ -417,6 +550,9 @@
                 <div class="price">₹{{ "%.2f"|format(item[3]) }}</div>
 
                 <div class="controls">
+                  {% if item[5] %}
+                    <button class="add-btn" type="button" disabled aria-disabled="true">Out of Stock</button>
+                  {% else %}
                   <div class="qty" aria-label="Quantity controls for {{ item[1] }}">
                     <button class="qty-decrease" data-id="{{ item[0] }}" aria-label="Decrease"><i class="bi bi-dash"></i></button>
                     <div class="count" id="qty-{{ item[0] }}">
@@ -430,6 +566,7 @@
                   </div>
 
                   <button class="add-btn" data-id="{{ item[0] }}" aria-label="Add to cart"><i class="bi bi-bag-plus"></i> Add</button>
+                  {% endif %}
                 </div>
               </div>
             </article>
@@ -552,8 +689,15 @@
     async function updateCartRequest(itemId, action) {
       try {
         const res = await fetch(`/update_cart/${itemId}/${action}`);
-        if (!res.ok) throw new Error('Network response failed');
-        return await res.json();
+        const data = await res.json();
+        if (!res.ok) {
+          if (data && data.out_of_stock) {
+            showToast('Out of Stock');
+            return null;
+          }
+          throw new Error((data && data.error) || 'Network response failed');
+        }
+        return data;
       } catch (e) {
         console.error(e);
         showToast('Could not update cart. Try again.');
@@ -602,6 +746,57 @@
 
     // Initial Calculation on Page Load
     recalcSummary();
+
+    // Refresh this page when returning with browser Back/Forward.
+    // This ensures quantities added from a searched-item page are
+    // rendered again from the existing Flask session cart.
+    window.addEventListener('pageshow', function (event) {
+      const navigation = performance.getEntriesByType('navigation')[0];
+      const isBackForward = navigation && navigation.type === 'back_forward';
+
+      if (event.persisted || isBackForward) {
+        window.location.reload();
+      }
+    });
+
+    // Progressive reveal animation; does not alter cart requests or backend routes.
+    (function () {
+      const cards = document.querySelectorAll('.product');
+      if (!cards.length) return;
+
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+      }
+
+      if (!('IntersectionObserver' in window)) return;
+
+      cards.forEach((card, index) => {
+        card.classList.add('motion-ready');
+        card.style.transitionDelay = `${Math.min(index % 8, 7) * 35}ms`;
+      });
+
+      const observer = new IntersectionObserver((entries, currentObserver) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            currentObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px 45px 0px' });
+
+      cards.forEach(card => observer.observe(card));
+    })();
+
+    // Keep the existing horizontal category navigation convenient on touch devices.
+    const categoryList = document.querySelector('.category-list');
+    if (categoryList) {
+      categoryList.addEventListener('wheel', event => {
+        if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
+          categoryList.parentElement.scrollLeft += event.deltaY;
+        }
+      }, { passive: true });
+    }
+
   </script>
 </body>
 </html>

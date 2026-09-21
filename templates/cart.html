@@ -184,6 +184,21 @@
             border-bottom: none;
         }
 
+        /* Ensure unit prices remain visible in the Price column */
+        .custom-table td.price-cell {
+            color: var(--text-strong) !important;
+            opacity: 1 !important;
+            white-space: nowrap;
+        }
+
+        .custom-table td.price-cell .unit-price {
+            display: inline-block;
+            color: var(--text-strong) !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            font-weight: 600;
+        }
+
         /* Quantity Buttons */
         .qty-controls {
             display: inline-flex;
@@ -484,8 +499,8 @@
                                         <td>
                                             <span class="fw-semibold">{{ item[1] }}</span>
                                         </td>
-                                        <td class="text-center text-muted">
-                                            ₹<span class="unit-price">{{ "%.2f"|format(item[2]) }}</span>
+                                        <td class="text-center price-cell">
+                                            <span aria-label="Price">₹<span class="unit-price">{{ "%.2f"|format(item[2]) }}</span></span>
                                         </td>
                                         <td class="text-center">
                                             <div class="qty-controls">

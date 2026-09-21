@@ -1,37 +1,638 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Orders</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management | Grocery Admin</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #0b1120;
+            --panel: #111b2e;
+            --panel2: #162238;
+            --border: #263650;
+            --text: #e5edf8;
+            --muted: #91a2bc;
+            --accent: #60a5fa;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Inter, system-ui, -apple-system, sans-serif;
+        }
+
+        .navbar {
+            background: #0f192b;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #f8fafc;
+            text-decoration: none;
+        }
+
+        .page-title {
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .muted { color: var(--muted); }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+        }
+
+        .stat-card {
+            background: linear-gradient(145deg, #16243b, #111b2e);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            height: 100%;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .form-control,
+        .form-select {
+            background-color: #0b1425;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .form-control::placeholder { color: #71839e; }
+
+        .form-control:focus,
+        .form-select:focus {
+            background-color: #0b1425;
+            color: white;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 .2rem #3b82f633;
+        }
+
+        .form-select option {
+            background: #111b2e;
+            color: white;
+        }
+
+        .table {
+            --bs-table-bg: transparent;
+            --bs-table-color: var(--text);
+            --bs-table-border-color: var(--border);
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            color: var(--muted);
+            font-size: .73rem;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            font-weight: 700;
+            padding: 16px;
+            white-space: nowrap;
+            background: #142036;
+        }
+
+        .table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background: #17253b;
+        }
+
+        .order-link {
+            color: #93c5fd;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .order-link:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .status {
+            display: inline-block;
+            border-radius: 30px;
+            padding: 6px 11px;
+            font-size: .76rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .status-pending {
+            background: #78350f55;
+            color: #fbbf24;
+            border: 1px solid #92400e;
+        }
+
+        .status-progress {
+            background: #1e40af55;
+            color: #93c5fd;
+            border: 1px solid #1d4ed8;
+        }
+
+        .status-completed {
+            background: #14532d66;
+            color: #86efac;
+            border: 1px solid #166534;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+        }
+
+        .btn-outline-light {
+            border-color: #3b4b65;
+            color: #cbd5e1;
+        }
+
+        .btn-outline-light:hover {
+            background: #263650;
+            color: white;
+        }
+
+        .empty-state {
+            padding: 55px 20px;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .mobile-order {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 17px;
+        }
+
+        .mobile-label {
+            color: var(--muted);
+            font-size: .73rem;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 767px) {
+            .page-title { font-size: 1.8rem; }
+        }
+    </style>
 </head>
-<body class="container mt-4">
-    <h1>All Orders</h1>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Order ID</th>
-                <th>Date</th>
-                <th>Customer</th>
-                <th>Address</th>
-                <th>Mobile</th>
-            </tr>
-        </thead>
-        <tbody>
+
+<body>
+
+<nav class="navbar">
+    <div class="container-fluid px-3 px-lg-5 py-3">
+        <div class="d-flex justify-content-between align-items-center w-100 gap-2">
+            <a class="brand" href="{{ url_for('admin') }}">
+                <span class="text-primary">●</span> Grocery Admin
+            </a>
+
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('admin') }}"
+                   class="btn btn-sm btn-outline-light">
+                    Dashboard
+                </a>
+
+                <a href="{{ url_for('logout') }}"
+                   class="btn btn-sm btn-outline-danger">
+                    Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main class="container-fluid px-3 px-lg-5 py-4 py-lg-5">
+
+    <!-- Page heading -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <div class="muted small mb-2">ADMINISTRATION / ORDERS</div>
+            <h1 class="page-title mb-2">Order Management</h1>
+            <p class="muted mb-0">
+                Track, update, and manage customer orders.
+            </p>
+        </div>
+
+        <a href="{{ url_for('admin') }}" class="btn btn-outline-light">
+            ← Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Calculate statistics -->
+    {% set stats = namespace(pending=0, progress=0, completed=0) %}
+
+    {% for order in orders %}
+        {% if order[5] == 'Pending' %}
+            {% set stats.pending = stats.pending + 1 %}
+        {% elif order[5] == 'In Progress' %}
+            {% set stats.progress = stats.progress + 1 %}
+        {% elif order[5] == 'Completed' %}
+            {% set stats.completed = stats.completed + 1 %}
+        {% endif %}
+    {% endfor %}
+
+    <!-- Statistics -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-6 col-xl-3">
+            <div class="stat-card">
+                <div class="muted small mb-2">Total Orders</div>
+                <div class="stat-number">{{ orders | length }}</div>
+                <div class="muted small">All recorded orders</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-xl-3">
+            <div class="stat-card">
+                <div class="muted small mb-2">Pending</div>
+                <div class="stat-number text-warning">{{ stats.pending }}</div>
+                <div class="muted small">Awaiting processing</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-xl-3">
+            <div class="stat-card">
+                <div class="muted small mb-2">In Progress</div>
+                <div class="stat-number text-info">{{ stats.progress }}</div>
+                <div class="muted small">Currently being processed</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-xl-3">
+            <div class="stat-card">
+                <div class="muted small mb-2">Completed</div>
+                <div class="stat-number text-success">{{ stats.completed }}</div>
+                <div class="muted small">Successfully completed</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Search and filters -->
+    <section class="panel p-3 p-lg-4 mb-4">
+        <div class="row g-3">
+
+            <div class="col-md-8">
+                <label for="orderSearch" class="form-label muted small">
+                    Search orders
+                </label>
+
+                <input type="search"
+                       id="orderSearch"
+                       class="form-control"
+                       placeholder="Search order ID, customer, address, or mobile...">
+            </div>
+
+            <div class="col-md-4">
+                <label for="statusFilter" class="form-label muted small">
+                    Filter by status
+                </label>
+
+                <select id="statusFilter" class="form-select">
+                    <option value="">All statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                </select>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Orders table -->
+    <section class="panel overflow-hidden">
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center p-3 p-lg-4 gap-2">
+            <div>
+                <h5 class="mb-1 fw-bold">All Orders</h5>
+                <div class="muted small">
+                    Select an order ID to view its full details.
+                </div>
+            </div>
+
+            <span class="badge text-bg-primary">
+                {{ orders | length }} orders
+            </span>
+        </div>
+
+        {% if orders %}
+
+        <!-- Desktop and tablet -->
+        <div class="table-responsive d-none d-md-block">
+
+            <table class="table align-middle" id="ordersTable">
+
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Address</th>
+                        <th>Mobile</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Update</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                {% for order in orders %}
+
+                    <tr class="order-row"
+                        data-search="{{ (order[0] ~ ' ' ~ order[2] ~ ' ' ~ order[3] ~ ' ' ~ (order[4] or '')) | lower }}"
+                        data-status="{{ order[5] }}">
+
+                        <td>
+                            <a class="order-link"
+                               href="{{ url_for('order_details', order_id=order[0]) }}">
+                                #{{ order[0] }}
+                            </a>
+                        </td>
+
+                        <td class="text-nowrap">{{ order[1] }}</td>
+
+                        <td class="fw-semibold">{{ order[2] }}</td>
+
+                        <td style="min-width: 180px;">
+                            {{ order[3] }}
+                        </td>
+
+                        <td>{{ order[4] or '—' }}</td>
+
+                        <td>{{ order[6] }}</td>
+
+                        <td class="text-nowrap fw-bold">
+                            ₹{{ '%.2f' | format(order[7] or 0) }}
+                        </td>
+
+                        <td>
+                            {% if order[5] == 'Completed' %}
+                                <span class="status status-completed">
+                                    ● Completed
+                                </span>
+                            {% elif order[5] == 'In Progress' %}
+                                <span class="status status-progress">
+                                    ● In Progress
+                                </span>
+                            {% else %}
+                                <span class="status status-pending">
+                                    ● Pending
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <form method="POST"
+                                  action="{{ url_for('update_order_status', order_id=order[0]) }}"
+                                  class="d-flex gap-2">
+
+                                <select name="status"
+                                        class="form-select form-select-sm"
+                                        aria-label="Update status for order {{ order[0] }}"
+                                        required>
+
+                                    {% for status in valid_statuses %}
+                                        <option value="{{ status }}"
+                                            {% if order[5] == status %}selected{% endif %}>
+                                            {{ status }}
+                                        </option>
+                                    {% endfor %}
+
+                                </select>
+
+                                <button type="submit"
+                                        class="btn btn-sm btn-primary">
+                                    Save
+                                </button>
+
+                            </form>
+                        </td>
+
+                        <td>
+                            <form method="POST"
+                                  action="{{ url_for('delete_order', order_id=order[0]) }}"
+                                  onsubmit="return confirm('Delete order #{{ order[0] }} permanently? This cannot be undone.');">
+
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-danger">
+                                    Delete
+                                </button>
+
+                            </form>
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+            </table>
+
+        </div>
+
+        <!-- Mobile cards -->
+        <div class="d-md-none p-3" id="mobileOrders">
+
+            <div class="d-grid gap-3">
+
             {% for order in orders %}
-            <tr>
-                <!-- ✅ Make Order ID clickable -->
-                <td>
-                    <a href="{{ url_for('order_details', order_id=order[0]) }}">
-                        {{ order[0] }}
-                    </a>
-                </td>
-                <td>{{ order[1] }}</td>
-                <td>{{ order[2] }}</td>
-                <td>{{ order[3] }}</td>
-                <td>{{ order[4] }}</td>
-            </tr>
+
+                <article class="mobile-order order-row"
+                         data-search="{{ (order[0] ~ ' ' ~ order[2] ~ ' ' ~ order[3] ~ ' ' ~ (order[4] or '')) | lower }}"
+                         data-status="{{ order[5] }}">
+
+                    <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+
+                        <div>
+                            <div class="muted small">Order ID</div>
+
+                            <a class="order-link fs-5"
+                               href="{{ url_for('order_details', order_id=order[0]) }}">
+                                #{{ order[0] }}
+                            </a>
+                        </div>
+
+                        {% if order[5] == 'Completed' %}
+                            <span class="status status-completed">Completed</span>
+                        {% elif order[5] == 'In Progress' %}
+                            <span class="status status-progress">In Progress</span>
+                        {% else %}
+                            <span class="status status-pending">Pending</span>
+                        {% endif %}
+
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="mobile-label">Customer</div>
+                        <div class="fw-semibold">{{ order[2] }}</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="mobile-label">Date</div>
+                        <div>{{ order[1] }}</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="mobile-label">Address</div>
+                        <div>{{ order[3] }}</div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+
+                        <div class="col-6">
+                            <div class="mobile-label">Mobile</div>
+                            <div>{{ order[4] or '—' }}</div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="mobile-label">Items</div>
+                            <div>{{ order[6] }}</div>
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="muted">Order total</span>
+                        <strong class="fs-5">
+                            ₹{{ '%.2f' | format(order[7] or 0) }}
+                        </strong>
+                    </div>
+
+                    <form method="POST"
+                          action="{{ url_for('update_order_status', order_id=order[0]) }}"
+                          class="mb-2">
+
+                        <label class="mobile-label" for="mobile-status-{{ order[0] }}">
+                            Update status
+                        </label>
+
+                        <div class="d-flex gap-2">
+
+                            <select name="status"
+                                    id="mobile-status-{{ order[0] }}"
+                                    class="form-select"
+                                    required>
+
+                                {% for status in valid_statuses %}
+                                    <option value="{{ status }}"
+                                        {% if order[5] == status %}selected{% endif %}>
+                                        {{ status }}
+                                    </option>
+                                {% endfor %}
+
+                            </select>
+
+                            <button type="submit" class="btn btn-primary">
+                                Save
+                            </button>
+
+                        </div>
+                    </form>
+
+                    <form method="POST"
+                          action="{{ url_for('delete_order', order_id=order[0]) }}"
+                          onsubmit="return confirm('Delete order #{{ order[0] }} permanently? This cannot be undone.');">
+
+                        <button type="submit"
+                                class="btn btn-outline-danger w-100">
+                            Delete Order
+                        </button>
+
+                    </form>
+
+                </article>
+
             {% endfor %}
-        </tbody>
-    </table>
+
+            </div>
+        </div>
+
+        <div id="noResults" class="empty-state d-none">
+            <h5 class="text-light">No matching orders</h5>
+            <p class="mb-0">Try changing your search or status filter.</p>
+        </div>
+
+        {% else %}
+
+        <div class="empty-state">
+            <div class="fs-1 mb-3">📦</div>
+            <h4 class="text-light">No orders yet</h4>
+            <p class="mb-0">New customer orders will appear here.</p>
+        </div>
+
+        {% endif %}
+
+    </section>
+
+    <div class="text-center muted small mt-4">
+        Grocery Admin · Order Management
+    </div>
+
+</main>
+
+<script>
+    const searchInput = document.getElementById("orderSearch");
+    const statusFilter = document.getElementById("statusFilter");
+    const rows = document.querySelectorAll(".order-row");
+    const noResults = document.getElementById("noResults");
+
+    function filterOrders() {
+        const search = searchInput.value.trim().toLowerCase();
+        const status = statusFilter.value;
+
+        let visible = 0;
+
+        rows.forEach(row => {
+            const text = row.dataset.search || "";
+            const rowStatus = row.dataset.status || "";
+
+            const matchesSearch = text.includes(search);
+            const matchesStatus = !status || rowStatus === status;
+            const show = matchesSearch && matchesStatus;
+
+            row.classList.toggle("d-none", !show);
+
+            if (show) {
+                visible++;
+            }
+        });
+
+        if (noResults) {
+            noResults.classList.toggle("d-none", visible !== 0);
+        }
+    }
+
+    searchInput.addEventListener("input", filterOrders);
+    statusFilter.addEventListener("change", filterOrders);
+</script>
+
 </body>
 </html>

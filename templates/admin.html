@@ -392,6 +392,7 @@
                                 <th>Price</th>
                                 <th>Shop</th>
                                 <th>Location</th>
+                                <th class="text-center">Stock Status</th>
                                 <th class="text-center pe-4">Actions</th>
                             </tr>
                         </thead>
@@ -433,6 +434,18 @@
                                         <i class="bi bi-geo-alt me-1 text-muted"></i>{{ item[6] }}
                                     </span>
                                 </td>
+                                <td class="text-center">
+                                    {% if item[7] %}
+                                        <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle">Out of Stock</span>
+                                    {% else %}
+                                        <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle">In Stock</span>
+                                    {% endif %}
+                                    <form method="POST" action="{{ url_for('toggle_stock', item_id=item[0]) }}" class="mt-2">
+                                        <button type="submit" class="btn btn-sm {% if item[7] %}btn-outline-success{% else %}btn-outline-warning{% endif %} rounded-2">
+                                            {% if item[7] %}Mark In Stock{% else %}Mark Out Stock{% endif %}
+                                        </button>
+                                    </form>
+                                </td>
                                 <td class="text-center pe-4">
                                     <div class="btn-group gap-2">
                                         <a href="{{ url_for('edit_item', item_id=item[0]) }}" 
@@ -449,7 +462,7 @@
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="6" class="text-center py-5 text-muted">
+                                <td colspan="7" class="text-center py-5 text-muted">
                                     <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
                                     No items found in your inventory database.
                                 </td>
