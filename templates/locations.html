@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -362,7 +363,7 @@
 
   <main class="container">
     <div class="glass-panel" role="region" aria-label="Select location panel">
-      
+
       <!-- Header Row -->
       <div class="row gy-3 align-items-center justify-content-between">
         <div class="col-12 col-md-6 header-content">
@@ -379,6 +380,13 @@
             </button>
           </div>
         </div>
+      </div>
+
+      <!-- Admin Navigation Button -->
+      <div class="d-flex justify-content-end mt-3">
+        <a href="/admin" class="btn btn-outline-light rounded-pill px-4">
+          <i class="bi bi-gear-fill me-2"></i> Go to Admin
+        </a>
       </div>
 
       <!-- Status Bar -->
@@ -398,16 +406,16 @@
            role="button"
            aria-label="Explore shops in {{ loc[1] }}"
            tabindex="0">
-          
+
           <div class="icon-wrapper" aria-hidden="true">
             <i class="bi bi-geo-alt-fill text-indigo"></i>
           </div>
-          
+
           <div>
             <h3 class="location-title">{{ loc[1] }}</h3>
             <p class="location-sub">Click to explore</p>
           </div>
-          
+
           <div class="action-badge">
             View Shops <i class="bi bi-arrow-right"></i>
           </div>
@@ -450,7 +458,7 @@
         cards.forEach(card => {
           const name = card.dataset.name || '';
           const isVisible = !term || name.includes(term);
-          
+
           if (isVisible) {
             card.style.display = '';
             visibleCount++;
