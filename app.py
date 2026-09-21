@@ -3,7 +3,7 @@ import sqlite3
 import os
 
 from functools import wraps
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import (
     Flask,
     render_template,
@@ -51,7 +51,96 @@ VALID_ORDER_STATUSES = (
 
 def get_db_connection():
     conn = sqlite3.connect(DB_NAME)
+    conn.execute("PRAGMA foreign_keys = ON")
     return conn
+
+
+# -----------------------
+# Order Number Helpers
+# -----------------------
+
+def generate_order_number(c):
+    """
+    Generate a unique formatted order number.
+
+    Format:
+    DMJ + hour + minute + second + year + day + month
+
+    Example:
+    DMJ14302520262109
+    """
+
+    offset = 0
+
+    while True:
+        generated_time = datetime.now() + timedelta(seconds=offset)
+
+        order_number = "DMJ" + generated_time.strftime(
+            "%H%M%S%Y%d%m"
+        )
+
+        c.execute("""
+            SELECT 1
+            FROM orders
+            WHERE order_number = ?
+        """, (order_number,))
+
+        if not c.fetchone():
+            return order_number
+
+        offset += 1
+
+
+def get_internal_order_id(c, order_ref):
+    """
+    Resolve a formatted order number to the internal numeric key.
+
+    Numeric references are also accepted for compatibility with
+    older links that may still exist.
+    """
+
+    c.execute("""
+        SELECT id
+        FROM orders
+        WHERE order_number = ?
+    """, (str(order_ref),))
+
+    row = c.fetchone()
+
+    if row:
+        return row[0]
+
+    # Backward compatibility for old numeric order URLs.
+    if str(order_ref).isdigit():
+        c.execute("""
+            SELECT id
+            FROM orders
+            WHERE id = ?
+        """, (int(order_ref),))
+
+        row = c.fetchone()
+
+        if row:
+            return row[0]
+
+    return None
+
+
+def get_order_number(c, internal_order_id):
+    """Return the formatted order number for an internal database ID."""
+
+    c.execute("""
+        SELECT order_number
+        FROM orders
+        WHERE id = ?
+    """, (internal_order_id,))
+
+    row = c.fetchone()
+
+    if row and row[0]:
+        return row[0]
+
+    return str(internal_order_id)
 
 
 # -----------------------
@@ -98,7 +187,8 @@ def init_db():
             customer_address TEXT NOT NULL,
             mobile TEXT,
             date TEXT NOT NULL,
-            status TEXT DEFAULT 'Pending'
+            status TEXT DEFAULT 'Pending',
+            order_number TEXT UNIQUE
         )
     """)
 
@@ -130,6 +220,40 @@ def init_db():
         """)
     except sqlite3.OperationalError:
         pass
+
+    # Add order_number to older orders tables if necessary.
+    try:
+        c.execute("""
+            ALTER TABLE orders
+            ADD COLUMN order_number TEXT
+        """)
+    except sqlite3.OperationalError:
+        pass
+
+    # Assign formatted order numbers to existing orders that
+    # do not already have one.
+    c.execute("""
+        SELECT id
+        FROM orders
+        WHERE order_number IS NULL
+           OR order_number = ''
+        ORDER BY id
+    """)
+
+    old_orders = c.fetchall()
+
+    for row in old_orders:
+        internal_order_id = row[0]
+        order_number = generate_order_number(c)
+
+        c.execute("""
+            UPDATE orders
+            SET order_number = ?
+            WHERE id = ?
+        """, (
+            order_number,
+            internal_order_id
+        ))
 
     conn.commit()
     conn.close()
@@ -389,8 +513,7 @@ def place_order():
     house_landmark = request.form.get("house_landmark", "").strip()
     mobile = request.form.get("mobile", "").strip()
 
-    # Combine the house/landmark and street address because the
-    # existing orders table has one customer_address column.
+    # Combine house/landmark and street address.
     full_address = ", ".join(
         part for part in (house_landmark, customer_address) if part
     )
@@ -443,23 +566,29 @@ def place_order():
             "%Y-%m-%d %H:%M:%S"
         )
 
+        # Generate the formatted order number.
+        order_number = generate_order_number(c)
+
         c.execute("""
             INSERT INTO orders (
                 customer_name,
                 customer_address,
                 mobile,
                 date,
-                status
+                status,
+                order_number
             )
-            VALUES (?, ?, ?, ?, 'Pending')
+            VALUES (?, ?, ?, ?, 'Pending', ?)
         """, (
             customer_name,
             full_address,
             mobile,
-            order_date
+            order_date,
+            order_number
         ))
 
-        order_id = c.lastrowid
+        # Keep the numeric ID internally for order_items relations.
+        internal_order_id = c.lastrowid
 
         for item_id, quantity in validated_items:
 
@@ -471,7 +600,7 @@ def place_order():
                 )
                 VALUES (?, ?, ?)
             """, (
-                order_id,
+                internal_order_id,
                 item_id,
                 quantity
             ))
@@ -487,10 +616,9 @@ def place_order():
 
     session["cart"] = {}
 
-    # Redirect to the tracking page instead of the plain-text
-    # order-success message.
+    # Use the formatted order number in the customer-facing URL.
     return redirect(
-        url_for("track_order", order_id=order_id)
+        url_for("track_order", order_id=order_number)
     )
 
 
@@ -498,13 +626,20 @@ def place_order():
 # Order Tracking
 # -----------------------
 
-@app.route("/track/<int:order_id>")
+@app.route("/track/<string:order_id>")
 def track_order(order_id):
 
     conn = get_db_connection()
     c = conn.cursor()
 
-    # Retrieve the order using the existing database columns.
+    # Accept formatted order numbers and legacy numeric references.
+    internal_order_id = get_internal_order_id(c, order_id)
+
+    if internal_order_id is None:
+        conn.close()
+        return "Order not found", 404
+
+    # Retrieve the order using its internal database key.
     c.execute("""
         SELECT
             id,
@@ -512,16 +647,21 @@ def track_order(order_id):
             customer_address,
             mobile,
             date,
-            COALESCE(status, 'Pending')
+            COALESCE(status, 'Pending'),
+            order_number
         FROM orders
         WHERE id = ?
-    """, (order_id,))
+    """, (internal_order_id,))
 
     order_row = c.fetchone()
 
     if not order_row:
         conn.close()
         return "Order not found", 404
+
+    formatted_order_number = (
+        order_row[6] or str(order_row[0])
+    )
 
     # Retrieve ordered products and their prices.
     c.execute("""
@@ -535,7 +675,7 @@ def track_order(order_id):
             ON order_items.item_id = items.id
         WHERE order_items.order_id = ?
         ORDER BY order_items.id
-    """, (order_id,))
+    """, (internal_order_id,))
 
     item_rows = c.fetchall()
 
@@ -554,14 +694,11 @@ def track_order(order_id):
 
     subtotal = sum(item["subtotal"] or 0 for item in items)
 
-    # This app's current schema does not store a delivery fee.
-    # The cart page currently uses ₹30 below ₹150 and free delivery
-    # at/above ₹150, so calculate the displayed fee using that rule.
+    # Delivery fee: ₹30 below ₹150; free at/above ₹150.
     delivery_fee = 30 if 0 < subtotal < 150 else 0
     total = subtotal + delivery_fee
 
-    # Adapt the app's existing status values to the labels used
-    # by the tracking page's progress display.
+    # Adapt status values to tracking-page progress labels.
     status = order_row[5]
 
     if status == "Pending":
@@ -574,8 +711,8 @@ def track_order(order_id):
         display_status = status
 
     order = {
-        "id": order_row[0],
-        "order_number": order_row[0],
+        "id": formatted_order_number,
+        "order_number": formatted_order_number,
         "name": order_row[1],
         "house_landmark": "",
         "address": order_row[2],
@@ -589,7 +726,6 @@ def track_order(order_id):
     }
 
     # Partner details are not stored in the current database.
-    # track.html will display its unavailable/not-assigned state.
     partner = None
 
     return render_template(
@@ -600,9 +736,8 @@ def track_order(order_id):
     )
 
 
-# Keep the old order-success URL working, but send customers
-# to the new tracking page instead of showing plain text.
-@app.route("/order_success/<int:order_id>")
+# Keep the old order-success URL working.
+@app.route("/order_success/<string:order_id>")
 def order_success(order_id):
 
     return redirect(
@@ -971,9 +1106,11 @@ def admin_orders():
     conn = get_db_connection()
     c = conn.cursor()
 
+    # Select the formatted order number as the first value so
+    # templates that display orders[i][0] show the DMJ number.
     c.execute("""
         SELECT
-            orders.id,
+            COALESCE(orders.order_number, CAST(orders.id AS TEXT)),
             orders.date,
             orders.customer_name,
             orders.customer_address,
@@ -1008,17 +1145,25 @@ def admin_orders():
 # Order Details
 # -----------------------
 
-@app.route("/admin/order/<int:order_id>")
+@app.route("/admin/order/<string:order_id>")
 @admin_required
 def order_details(order_id):
 
     conn = get_db_connection()
     c = conn.cursor()
 
+    # Resolve the formatted order number or a legacy numeric reference.
+    internal_order_id = get_internal_order_id(c, order_id)
+
+    if internal_order_id is None:
+        conn.close()
+        return "Order not found", 404
+
     # Retrieve the order and customer information.
+    # The first tuple value is the formatted order number.
     c.execute("""
         SELECT
-            id,
+            COALESCE(order_number, CAST(id AS TEXT)),
             customer_name,
             customer_address,
             mobile,
@@ -1026,13 +1171,15 @@ def order_details(order_id):
             COALESCE(status, 'Pending')
         FROM orders
         WHERE id = ?
-    """, (order_id,))
+    """, (internal_order_id,))
 
     order = c.fetchone()
 
     if not order:
         conn.close()
         return "Order not found", 404
+
+    formatted_order_number = order[0]
 
     # Retrieve the products associated with this order.
     c.execute("""
@@ -1049,7 +1196,7 @@ def order_details(order_id):
             ON order_items.item_id = items.id
         WHERE order_items.order_id = ?
         ORDER BY order_items.id
-    """, (order_id,))
+    """, (internal_order_id,))
 
     items = c.fetchall()
 
@@ -1064,7 +1211,7 @@ def order_details(order_id):
     return render_template(
         "order_details.html",
         order=order,
-        order_id=order_id,
+        order_id=formatted_order_number,
         items=items,
         total=total,
         valid_statuses=VALID_ORDER_STATUSES
@@ -1076,7 +1223,7 @@ def order_details(order_id):
 # -----------------------
 
 @app.route(
-    "/admin/order/<int:order_id>/update-status",
+    "/admin/order/<string:order_id>/update-status",
     methods=["POST"]
 )
 @admin_required
@@ -1091,13 +1238,19 @@ def update_order_status(order_id):
     conn = get_db_connection()
     c = conn.cursor()
 
+    internal_order_id = get_internal_order_id(c, order_id)
+
+    if internal_order_id is None:
+        conn.close()
+        return "Order not found", 404
+
     c.execute("""
         UPDATE orders
         SET status = ?
         WHERE id = ?
     """, (
         status,
-        order_id
+        internal_order_id
     ))
 
     updated = c.rowcount
@@ -1109,7 +1262,10 @@ def update_order_status(order_id):
         return "Order not found", 404
 
     return redirect(
-        url_for("order_details", order_id=order_id)
+        url_for(
+            "order_details",
+            order_id=order_id
+        )
     )
 
 
@@ -1118,7 +1274,7 @@ def update_order_status(order_id):
 # -----------------------
 
 @app.route(
-    "/admin/order/<int:order_id>/delete",
+    "/admin/order/<string:order_id>/delete",
     methods=["POST"]
 )
 @admin_required
@@ -1128,18 +1284,13 @@ def delete_order(order_id):
 
     try:
 
-        # Keep the order and its order items consistent.
         conn.execute("BEGIN")
 
         c = conn.cursor()
 
-        c.execute("""
-            SELECT id
-            FROM orders
-            WHERE id = ?
-        """, (order_id,))
+        internal_order_id = get_internal_order_id(c, order_id)
 
-        if not c.fetchone():
+        if internal_order_id is None:
             conn.rollback()
             return "Order not found", 404
 
@@ -1147,13 +1298,13 @@ def delete_order(order_id):
         c.execute("""
             DELETE FROM order_items
             WHERE order_id = ?
-        """, (order_id,))
+        """, (internal_order_id,))
 
         # Delete the order itself.
         c.execute("""
             DELETE FROM orders
             WHERE id = ?
-        """, (order_id,))
+        """, (internal_order_id,))
 
         conn.commit()
 
