@@ -698,7 +698,7 @@
 
     {% if 'confirm' in order_status or 'process' in order_status or 'prepar' in order_status %}
         {% set current_step = 1 %}
-    {% elif 'ready' in order_status or 'picked' in order_status or 'transit' in order_status or 'ship' in order_status or 'out for delivery' in order_status %}
+    {% elif 'ready' in order_status or 'picked' in order_status or 'transit' in order_status or 'ship' in order_status or 'out for delivery' in order_status or 'on the way' in order_status %}
         {% set current_step = 2 %}
     {% elif 'deliver' in order_status or 'complete' in order_status %}
         {% set current_step = 3 %}

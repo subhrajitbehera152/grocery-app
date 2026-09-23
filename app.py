@@ -41,6 +41,7 @@ ADMIN_PASS = os.environ.get(
 VALID_ORDER_STATUSES = (
     "Pending",
     "In Progress",
+    "On the way",
     "Completed"
 )
 
@@ -64,10 +65,7 @@ def generate_order_number(c):
     Generate a unique formatted order number.
 
     Format:
-    DMJ + hour + minute + second + year + day + month
-
-    Example:
-    DMJ14302520262109
+    DMJ + hour + minute + second + year + day + month + sum(HH+MM+SS)
     """
 
     offset = 0
@@ -75,8 +73,16 @@ def generate_order_number(c):
     while True:
         generated_time = datetime.now() + timedelta(seconds=offset)
 
-        order_number = "DMJ" + generated_time.strftime(
-            "%H%M%S%Y%d%m"
+        hour = generated_time.hour
+        minute = generated_time.minute
+        second = generated_time.second
+
+        time_sum = hour + minute + second
+
+        order_number = (
+            "DMJ"
+            + generated_time.strftime("%H%M%S%Y%d%m")
+            + str(time_sum)
         )
 
         c.execute("""
@@ -705,6 +711,8 @@ def track_order(order_id):
         display_status = "Order Placed"
     elif status == "In Progress":
         display_status = "Preparing"
+    elif status == "On the way":
+        display_status = "On the way"
     elif status == "Completed":
         display_status = "Delivered"
     else:

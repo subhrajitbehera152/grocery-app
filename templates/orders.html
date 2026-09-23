@@ -159,6 +159,12 @@
             border: 1px solid #166534;
         }
 
+        .status-transit {
+            background: #5b21b655;
+            color: #c4b5fd;
+            border: 1px solid #7c3aed;
+        }
+
         .btn-primary {
             background: #2563eb;
             border-color: #2563eb;
@@ -250,13 +256,15 @@
     </div>
 
     <!-- Calculate statistics -->
-    {% set stats = namespace(pending=0, progress=0, completed=0) %}
+    {% set stats = namespace(pending=0, progress=0, on_the_way=0, completed=0) %}
 
     {% for order in orders %}
         {% if order[5] == 'Pending' %}
             {% set stats.pending = stats.pending + 1 %}
         {% elif order[5] == 'In Progress' %}
             {% set stats.progress = stats.progress + 1 %}
+        {% elif order[5] == 'On the way' %}
+            {% set stats.on_the_way = stats.on_the_way + 1 %}
         {% elif order[5] == 'Completed' %}
             {% set stats.completed = stats.completed + 1 %}
         {% endif %}
@@ -285,6 +293,14 @@
                 <div class="muted small mb-2">In Progress</div>
                 <div class="stat-number text-info">{{ stats.progress }}</div>
                 <div class="muted small">Currently being processed</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-xl-3">
+            <div class="stat-card">
+                <div class="muted small mb-2">On the way</div>
+                <div class="stat-number" style="color: #c4b5fd;">{{ stats.on_the_way }}</div>
+                <div class="muted small">Orders out for delivery</div>
             </div>
         </div>
 
@@ -320,6 +336,7 @@
                     <option value="">All statuses</option>
                     <option value="Pending">Pending</option>
                     <option value="In Progress">In Progress</option>
+                    <option value="On the way">On the way</option>
                     <option value="Completed">Completed</option>
                 </select>
             </div>
@@ -403,6 +420,10 @@
                                 <span class="status status-progress">
                                     ● In Progress
                                 </span>
+                            {% elif order[5] == 'On the way' %}
+                                <span class="status status-transit">
+                                    ● On the way
+                                </span>
                             {% else %}
                                 <span class="status status-pending">
                                     ● Pending
@@ -473,6 +494,8 @@
                             <span class="status status-completed">Completed</span>
                         {% elif order[5] == 'In Progress' %}
                             <span class="status status-progress">In Progress</span>
+                        {% elif order[5] == 'On the way' %}
+                            <span class="status status-transit">On the way</span>
                         {% else %}
                             <span class="status status-pending">Pending</span>
                         {% endif %}

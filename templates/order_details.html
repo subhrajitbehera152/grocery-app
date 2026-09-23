@@ -137,6 +137,12 @@
             border: 1px solid #166534;
         }
 
+        .status-transit {
+            background: #5b21b655;
+            color: #c4b5fd;
+            border: 1px solid #7c3aed;
+        }
+
         .total-box {
             background: #0c1729;
             border: 1px solid var(--border);
@@ -328,6 +334,8 @@
                 <span class="status status-completed">● Completed</span>
             {% elif order[5] == 'In Progress' %}
                 <span class="status status-progress">● In Progress</span>
+            {% elif order[5] == 'On the way' %}
+                <span class="status status-transit">● On the way</span>
             {% else %}
                 <span class="status status-pending">● Pending</span>
             {% endif %}
