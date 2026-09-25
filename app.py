@@ -35,7 +35,7 @@ ADMIN_USER = os.environ.get(
 
 ADMIN_PASS = os.environ.get(
     "ADMIN_PASS",
-    "password"
+    "9938950097"
 )
 
 VALID_ORDER_STATUSES = (

@@ -212,6 +212,16 @@
             }
         }
     </style>
+
+    <style id="order-scroll-preservation">
+        html {
+            scroll-behavior: auto !important;
+        }
+        body {
+            overflow-anchor: auto;
+        }
+    </style>
+
 </head>
 
 <body>
@@ -637,6 +647,81 @@
 
     searchInput.addEventListener("input", filterOrders);
     statusFilter.addEventListener("change", filterOrders);
+</script>
+
+
+<script id="order-scroll-preservation-script">
+(function () {
+    "use strict";
+
+    const SCROLL_KEY = "orderManagementScrollY";
+
+    function saveScrollPosition() {
+        try {
+            sessionStorage.setItem(
+                SCROLL_KEY,
+                String(window.scrollY || window.pageYOffset || 0)
+            );
+        } catch (e) {}
+    }
+
+    function getSavedScrollPosition() {
+        try {
+            const value = parseInt(sessionStorage.getItem(SCROLL_KEY) || "0", 10);
+            return Number.isFinite(value) && value >= 0 ? value : 0;
+        } catch (e) {
+            return 0;
+        }
+    }
+
+    function restoreScrollPosition() {
+        const y = getSavedScrollPosition();
+
+        const restore = function () {
+            window.scrollTo(0, y);
+
+            requestAnimationFrame(function () {
+                window.scrollTo(0, y);
+
+                setTimeout(function () {
+                    window.scrollTo(0, y);
+                }, 80);
+            });
+        };
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", restore, { once: true });
+        } else {
+            restore();
+        }
+    }
+
+    // Remember the exact position while the admin is working.
+    window.addEventListener("scroll", saveScrollPosition, { passive: true });
+
+    // Save immediately before an order update/delete or any other link navigation.
+    document.addEventListener("click", function (event) {
+        const link = event.target.closest("a");
+        if (link && link.href) {
+            saveScrollPosition();
+        }
+    }, true);
+
+    // Save immediately before POST forms such as status update/delete.
+    document.addEventListener("submit", function () {
+        saveScrollPosition();
+    }, true);
+
+    // Do not let browser history automatically choose another position.
+    if ("scrollRestoration" in history) {
+        history.scrollRestoration = "manual";
+    }
+
+    restoreScrollPosition();
+
+    // Save one final time when leaving/reloading the page.
+    window.addEventListener("pagehide", saveScrollPosition);
+})();
 </script>
 
 </body>
