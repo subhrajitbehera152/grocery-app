@@ -558,7 +558,7 @@
                 </div>
 
                 <div class="muted small mt-2" id="deliveryExplanation">
-                    A ₹30 delivery fee applies when the original items subtotal is below ₹150.
+                    A ₹30 delivery fee applies when the original items subtotal is below ₹199.
                     If an item is marked out of stock, no delivery fee is added to the adjusted total.
                 </div>
 
@@ -632,17 +632,17 @@
          * Delivery logic:
          *
          * No items marked out of stock:
-         *   Original subtotal below ₹150 -> ₹30 delivery fee.
-         *   Original subtotal ₹150 or more -> free delivery.
+         *   Original subtotal below ₹199 -> ₹30 delivery fee.
+         *   Original subtotal ₹199 or more -> free delivery.
          *
          * At least one item marked out of stock:
          *   Deduct unavailable items and do not add a delivery fee,
-         *   even if the adjusted subtotal is below ₹150.
+         *   even if the adjusted subtotal is below ₹199.
          */
 
         let deliveryFee = 0;
 
-        if (outOfStockCount === 0 && originalSubtotal < 150) {
+        if (outOfStockCount === 0 && originalSubtotal < 199) {
             deliveryFee = 30;
         }
 
@@ -683,12 +683,12 @@
         if (outOfStockCount > 0) {
             explanation.textContent =
                 "Out-of-stock items have been deducted. No delivery fee is added after an item is marked out of stock.";
-        } else if (originalSubtotal < 150) {
+        } else if (originalSubtotal < 199) {
             explanation.textContent =
-                "The original items subtotal is below ₹150, so a ₹30 delivery fee applies.";
+                "The original items subtotal is below ₹199, so a ₹30 delivery fee applies.";
         } else {
             explanation.textContent =
-                "The original items subtotal is ₹150 or more, so delivery is free.";
+                "The original items subtotal is ₹199 or more, so delivery is free.";
         }
     }
 

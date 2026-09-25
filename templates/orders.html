@@ -407,7 +407,7 @@
                         <!-- Calculate delivery fee separately for every order -->
                         <td class="text-nowrap fw-bold">
                             {% set subtotal = order[7] or 0 %}
-                            {% set delivery_fee = 30 if subtotal < 150 else 0 %}
+                            {% set delivery_fee = 30 if subtotal < 199 else 0 %}
                             ₹{{ '%.2f' | format(subtotal + delivery_fee) }}
                         </td>
 
@@ -533,7 +533,7 @@
 
                         <!-- Calculate delivery fee separately for every order -->
                         {% set subtotal = order[7] or 0 %}
-                        {% set delivery_fee = 30 if subtotal < 150 else 0 %}
+                        {% set delivery_fee = 30 if subtotal < 199 else 0 %}
 
                         <strong class="fs-5">
                             ₹{{ '%.2f' | format(subtotal + delivery_fee) }}

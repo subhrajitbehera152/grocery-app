@@ -700,8 +700,8 @@ def track_order(order_id):
 
     subtotal = sum(item["subtotal"] or 0 for item in items)
 
-    # Delivery fee: ₹30 below ₹150; free at/above ₹150.
-    delivery_fee = 30 if 0 < subtotal < 150 else 0
+    # Delivery fee: ₹30 below ₹199; free at/above ₹199.
+    delivery_fee = 30 if 0 < subtotal < 199 else 0
     total = subtotal + delivery_fee
 
     # Adapt status values to tracking-page progress labels.
