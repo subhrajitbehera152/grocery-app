@@ -30,12 +30,12 @@ app.secret_key = os.environ.get(
 
 ADMIN_USER = os.environ.get(
     "ADMIN_USER",
-    "subhrajitbehera153"
+    "subhrajitbehera152"
 )
 
 ADMIN_PASS = os.environ.get(
     "ADMIN_PASS",
-    "9938950097"
+    "9938950097_St"
 )
 
 VALID_ORDER_STATUSES = (
