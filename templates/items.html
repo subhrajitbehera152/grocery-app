@@ -494,6 +494,275 @@
     }
 
   </style>
+
+
+
+
+<style id="product-zoom-modal-style">
+/* Product zoom - matches the existing dark item-page theme */
+.product-zoom-modal{
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+    background:rgba(8,10,14,.88);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .28s ease, visibility 0s linear .28s;
+}
+
+.product-zoom-modal.is-open{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+    transition:opacity .28s ease, visibility 0s linear 0s;
+}
+
+.product-zoom-dialog{
+    position:relative;
+    width:min(94vw,520px);
+    max-height:92vh;
+    overflow:hidden;
+    background:#171a21;
+    color:#f5f7fa;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:24px;
+    box-shadow:0 28px 80px rgba(0,0,0,.65);
+    transform:translateY(18px) scale(.94);
+    opacity:0;
+    transition:transform .32s cubic-bezier(.22,1,.36,1), opacity .24s ease;
+    outline:none;
+}
+
+.product-zoom-modal.is-open .product-zoom-dialog{
+    transform:translateY(0) scale(1);
+    opacity:1;
+}
+
+.product-zoom-close{
+    position:absolute;
+    top:12px;
+    right:12px;
+    z-index:5;
+    width:42px;
+    height:42px;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(25,28,36,.92);
+    color:#fff;
+    box-shadow:0 6px 20px rgba(0,0,0,.35);
+    cursor:pointer;
+    transition:transform .2s ease, background .2s ease, border-color .2s ease;
+}
+
+.product-zoom-close:hover{
+    transform:scale(1.08);
+    background:#242934;
+    border-color:rgba(255,255,255,.2);
+}
+
+.product-zoom-image-wrap{
+    position:relative;
+    width:100%;
+    height:min(55vh,430px);
+    min-height:260px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#101319;
+    overflow:hidden;
+    border-bottom:1px solid rgba(255,255,255,.07);
+}
+
+.product-zoom-image{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    padding:22px;
+    transform:scale(.86);
+    opacity:0;
+    transition:transform .42s cubic-bezier(.22,1,.36,1), opacity .28s ease;
+    filter:drop-shadow(0 18px 25px rgba(0,0,0,.35));
+}
+
+.product-zoom-modal.is-open .product-zoom-image{
+    transform:scale(1);
+    opacity:1;
+}
+
+.product-zoom-stock{
+    position:absolute;
+    left:16px;
+    bottom:16px;
+    padding:7px 11px;
+    border-radius:999px;
+    background:#dc3545;
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    display:none;
+    box-shadow:0 5px 15px rgba(0,0,0,.3);
+}
+
+.product-zoom-stock.show{
+    display:block;
+}
+
+.product-zoom-content{
+    padding:20px 20px 22px;
+    background:#171a21;
+}
+
+.product-zoom-title{
+    margin:0 0 7px;
+    font-size:23px;
+    line-height:1.2;
+    font-weight:800;
+    color:#fff;
+}
+
+.product-zoom-meta{
+    color:#aeb5c1;
+    font-size:13px;
+    margin-bottom:7px;
+}
+
+.product-zoom-price{
+    color:#54d68b;
+    font-size:22px;
+    font-weight:800;
+    margin-bottom:16px;
+}
+
+.product-zoom-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.product-zoom-qty{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    width:124px;
+    height:46px;
+    padding:4px;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:14px;
+    background:#101319;
+}
+
+.product-zoom-qty button{
+    width:38px;
+    height:38px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:10px;
+    background:#20242d;
+    color:#54d68b;
+    box-shadow:0 3px 10px rgba(0,0,0,.2);
+    cursor:pointer;
+    font-size:18px;
+    transition:transform .16s ease, background .16s ease;
+}
+
+.product-zoom-qty button:hover{
+    background:#292e38;
+}
+
+.product-zoom-qty button:active{
+    transform:scale(.92);
+}
+
+.product-zoom-qty .modal-count{
+    min-width:25px;
+    text-align:center;
+    font-size:16px;
+    font-weight:800;
+    color:#fff;
+}
+
+.product-zoom-add{
+    flex:1;
+    min-height:46px;
+    border:0;
+    border-radius:14px;
+    background:#198754;
+    color:#fff;
+    font-weight:800;
+    cursor:pointer;
+    transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+}
+
+.product-zoom-add:hover{
+    transform:translateY(-1px);
+    box-shadow:0 8px 22px rgba(25,135,84,.3);
+}
+
+.product-zoom-add:active{
+    transform:scale(.98);
+}
+
+.product-zoom-add:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+    transform:none;
+    box-shadow:none;
+}
+
+.product-zoom-hint{
+    margin-top:10px;
+    text-align:center;
+    color:#737b88;
+    font-size:11px;
+}
+
+.product-image-clickable{
+    cursor:zoom-in;
+}
+
+@media (max-width:600px){
+    .product-zoom-modal{
+        padding:10px;
+    }
+
+    .product-zoom-dialog{
+        width:100%;
+        max-height:94vh;
+        border-radius:22px;
+    }
+
+    .product-zoom-image-wrap{
+        height:46vh;
+        min-height:245px;
+    }
+
+    .product-zoom-content{
+        padding:17px 15px 18px;
+    }
+
+    .product-zoom-title{
+        font-size:20px;
+    }
+
+    .product-zoom-actions{
+        gap:8px;
+    }
+
+    .product-zoom-qty{
+        width:112px;
+    }
+}
+</style>
+
 </head>
 <body>
 
@@ -502,8 +771,8 @@
     <div class="brand">
       <div class="logo">G</div>
       <div>
-        <div class="title">DMJDailyBazar.in</div>
-        <div class="subtitle">FAST DELIVERY | FRESH PROMISE</div>
+        <div class="title">DMJDailyBazarKart</div>
+        <div class="subtitle">Smart & Fast Shopping | 30 min EXPRESS DELIVERY</div>
       </div>
     </div>
 
@@ -799,6 +1068,9 @@
 
   </script>
 
+
+
+
 <script id="category-order-only">
 (function () {
   "use strict";
@@ -931,6 +1203,395 @@
   } else {
     reorderCategories();
   }
+})();
+</script>
+
+
+<!-- Product Double-Click Preview Modal -->
+<div id="productZoomModal" class="product-zoom-modal" aria-hidden="true">
+  <div class="product-zoom-dialog" role="dialog" aria-modal="true" aria-labelledby="productZoomTitle" tabindex="-1">
+    <button type="button" class="product-zoom-close" id="productZoomClose" aria-label="Close product preview">
+      <i class="bi bi-x-lg"></i>
+    </button>
+    <div class="product-zoom-image-wrap">
+      <img id="productZoomImage" class="product-zoom-image" src="" alt="">
+      <div id="productZoomStock" class="product-zoom-stock">Out of Stock</div>
+    </div>
+    <div class="product-zoom-content">
+      <h2 id="productZoomTitle" class="product-zoom-title"></h2>
+      <div id="productZoomMeta" class="product-zoom-meta"></div>
+      <div id="productZoomPrice" class="product-zoom-price"></div>
+      <div class="product-zoom-actions">
+        <div class="product-zoom-qty" aria-label="Quantity controls">
+          <button type="button" id="productZoomDecrease" aria-label="Decrease quantity"><i class="bi bi-dash"></i></button>
+          <span id="productZoomCount" class="modal-count">0</span>
+          <button type="button" id="productZoomIncrease" aria-label="Increase quantity"><i class="bi bi-plus"></i></button>
+        </div>
+        <button type="button" id="productZoomAdd" class="product-zoom-add">
+          <i class="bi bi-bag-plus"></i> Add to Cart
+        </button>
+      </div>
+      <div class="product-zoom-hint">Double-click any product card to open this preview</div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<div id="productZoomModal" class="product-zoom-modal" aria-hidden="true">
+    <div class="product-zoom-dialog" role="dialog" aria-modal="true"
+         aria-labelledby="productZoomTitle" tabindex="-1">
+
+        <button type="button" class="product-zoom-close" id="productZoomClose"
+                aria-label="Close product preview">
+            <i class="bi bi-x-lg"></i>
+        </button>
+
+        <div class="product-zoom-image-wrap">
+            <img id="productZoomImage" class="product-zoom-image" src="" alt="">
+            <div id="productZoomStock" class="product-zoom-stock">Out of Stock</div>
+        </div>
+
+        <div class="product-zoom-content">
+            <h2 id="productZoomTitle" class="product-zoom-title"></h2>
+            <div id="productZoomMeta" class="product-zoom-meta"></div>
+            <div id="productZoomPrice" class="product-zoom-price"></div>
+
+            <div class="product-zoom-actions">
+                <div class="product-zoom-qty" aria-label="Quantity controls">
+                    <button type="button" id="productZoomDecrease" aria-label="Decrease quantity">
+                        <i class="bi bi-dash"></i>
+                    </button>
+                    <span id="productZoomCount" class="modal-count">0</span>
+                    <button type="button" id="productZoomIncrease" aria-label="Increase quantity">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                </div>
+
+                <button type="button" id="productZoomAdd" class="product-zoom-add">
+                    <i class="bi bi-bag-plus"></i> Add to Cart
+                </button>
+            </div>
+
+            <div class="product-zoom-hint">Tap the product image to view it larger</div>
+        </div>
+    </div>
+</div>
+
+
+<script id="product-zoom-modal-script">
+(function () {
+    "use strict";
+
+    function initProductZoom() {
+        const modal = document.getElementById("productZoomModal");
+        const dialog = document.querySelector(".product-zoom-dialog");
+        const closeBtn = document.getElementById("productZoomClose");
+        const zoomImage = document.getElementById("productZoomImage");
+        const zoomTitle = document.getElementById("productZoomTitle");
+        const zoomMeta = document.getElementById("productZoomMeta");
+        const zoomPrice = document.getElementById("productZoomPrice");
+        const zoomStock = document.getElementById("productZoomStock");
+        const zoomCount = document.getElementById("productZoomCount");
+        const zoomDecrease = document.getElementById("productZoomDecrease");
+        const zoomIncrease = document.getElementById("productZoomIncrease");
+        const zoomAdd = document.getElementById("productZoomAdd");
+
+        if (!modal || !dialog || !closeBtn || !zoomImage || !zoomTitle ||
+            !zoomMeta || !zoomPrice || !zoomCount || !zoomDecrease ||
+            !zoomIncrease || !zoomAdd) {
+            return;
+        }
+
+        let activeProduct = null;
+        let previousBodyOverflow = "";
+        let previousFocusedElement = null;
+
+        function getProductImage(product) {
+            const image =
+                product.querySelector("img") ||
+                product.querySelector(".item-image img") ||
+                product.querySelector(".product-img img");
+
+            return image ? (image.currentSrc || image.src || "") : "";
+        }
+
+        function getProductName(product) {
+            const el =
+                product.querySelector("[data-item-name]") ||
+                product.querySelector(".product-name") ||
+                product.querySelector(".item-name") ||
+                product.querySelector("h5") ||
+                product.querySelector("h6");
+
+            return el ? el.textContent.trim() : "Product";
+        }
+
+        function getProductPrice(product) {
+            const el =
+                product.querySelector("[data-item-price]") ||
+                product.querySelector(".price") ||
+                product.querySelector(".item-price") ||
+                product.querySelector(".product-price");
+
+            return el ? el.textContent.trim() : "";
+        }
+
+        function getProductMeta(product) {
+            const el =
+                product.querySelector("[data-item-unit]") ||
+                product.querySelector(".unit") ||
+                product.querySelector(".item-unit") ||
+                product.querySelector(".product-unit");
+
+            return el ? el.textContent.trim() : "";
+        }
+
+        function getProductCount(product) {
+            const count =
+                product.querySelector(".item-count") ||
+                product.querySelector(".qty-count") ||
+                product.querySelector(".count") ||
+                product.querySelector("[data-count]");
+
+            if (!count) return 0;
+
+            const value = parseInt(count.textContent.trim(), 10);
+            return Number.isFinite(value) ? value : 0;
+        }
+
+        function isOutOfStock(product) {
+            const text = product.textContent.toLowerCase();
+            return (
+                product.classList.contains("out-of-stock") ||
+                product.dataset.stock === "0" ||
+                text.includes("out of stock")
+            );
+        }
+
+        function syncModalCount() {
+            if (!activeProduct) return;
+
+            const count = getProductCount(activeProduct);
+            zoomCount.textContent = String(count);
+
+            const outOfStock = isOutOfStock(activeProduct);
+            zoomDecrease.disabled = count <= 0;
+            zoomIncrease.disabled = outOfStock;
+            zoomAdd.disabled = outOfStock;
+        }
+
+        function triggerCardButton(product, direction) {
+            if (!product) return;
+
+            const selectors = direction === "increase"
+                ? [
+                    '[data-action="increase"]',
+                    ".increase",
+                    ".plus-btn",
+                    ".qty-plus",
+                    ".btn-plus",
+                    "button[aria-label*='Increase']",
+                    "button[aria-label*='increase']"
+                ]
+                : [
+                    '[data-action="decrease"]',
+                    ".decrease",
+                    ".minus-btn",
+                    ".qty-minus",
+                    ".btn-minus",
+                    "button[aria-label*='Decrease']",
+                    "button[aria-label*='decrease']"
+                ];
+
+            let button = null;
+
+            for (const selector of selectors) {
+                button = product.querySelector(selector);
+                if (button) break;
+            }
+
+            if (!button) {
+                const buttons = Array.from(product.querySelectorAll("button"));
+                const iconButton = buttons.find(function (btn) {
+                    const value = (
+                        btn.textContent + " " +
+                        (btn.getAttribute("aria-label") || "") + " " +
+                        (btn.className || "")
+                    ).toLowerCase();
+
+                    return direction === "increase"
+                        ? value.includes("plus") || value.trim() === "+"
+                        : value.includes("minus") || value.trim() === "-";
+                });
+
+                button = iconButton || null;
+            }
+
+            if (button && !button.disabled) {
+                button.click();
+                setTimeout(syncModalCount, 30);
+            }
+        }
+
+        function addFromCard(product) {
+            if (!product || isOutOfStock(product)) return;
+
+            const buttons = Array.from(product.querySelectorAll("button"));
+            const addButton = buttons.find(function (btn) {
+                const value = (
+                    btn.textContent + " " +
+                    (btn.getAttribute("aria-label") || "") + " " +
+                    (btn.className || "")
+                ).toLowerCase();
+
+                return (
+                    value.includes("add to cart") ||
+                    value.includes("add") ||
+                    value.includes("cart")
+                );
+            });
+
+            if (addButton && !addButton.disabled) {
+                addButton.click();
+                setTimeout(syncModalCount, 50);
+            }
+        }
+
+        function openZoom(product) {
+            if (!product) return;
+
+            const image = getProductImage(product);
+            if (!image) return;
+
+            activeProduct = product;
+            previousFocusedElement = document.activeElement;
+            previousBodyOverflow = document.body.style.overflow;
+
+            zoomImage.src = image;
+            zoomImage.alt = getProductName(product);
+            zoomTitle.textContent = getProductName(product);
+            zoomMeta.textContent = getProductMeta(product);
+            zoomPrice.textContent = getProductPrice(product);
+
+            if (isOutOfStock(product)) {
+                zoomStock.classList.add("show");
+            } else {
+                zoomStock.classList.remove("show");
+            }
+
+            syncModalCount();
+
+            document.body.style.overflow = "hidden";
+            modal.setAttribute("aria-hidden", "false");
+            modal.classList.add("is-open");
+
+            requestAnimationFrame(function () {
+                dialog.focus();
+            });
+        }
+
+        function closeZoom() {
+            modal.classList.remove("is-open");
+            modal.setAttribute("aria-hidden", "true");
+
+            setTimeout(function () {
+                if (!modal.classList.contains("is-open")) {
+                    zoomImage.removeAttribute("src");
+                }
+            }, 320);
+
+            document.body.style.overflow = previousBodyOverflow;
+
+            if (previousFocusedElement &&
+                typeof previousFocusedElement.focus === "function") {
+                previousFocusedElement.focus({ preventScroll: true });
+            }
+
+            activeProduct = null;
+        }
+
+        /*
+         * Single click/tap ONLY on the product image.
+         * Existing product buttons and cart controls remain untouched.
+         */
+        document.addEventListener("click", function (event) {
+            const image = event.target.closest(".product img");
+            if (!image) return;
+
+            const product = image.closest(".product");
+            if (!product) return;
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            openZoom(product);
+        }, true);
+
+        closeBtn.addEventListener("click", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            closeZoom();
+        });
+
+        modal.addEventListener("click", function (event) {
+            if (event.target === modal) {
+                closeZoom();
+            }
+        });
+
+        zoomDecrease.addEventListener("click", function () {
+            triggerCardButton(activeProduct, "decrease");
+        });
+
+        zoomIncrease.addEventListener("click", function () {
+            triggerCardButton(activeProduct, "increase");
+        });
+
+        zoomAdd.addEventListener("click", function () {
+            addFromCard(activeProduct);
+        });
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape" && modal.classList.contains("is-open")) {
+                closeZoom();
+            }
+        });
+
+        zoomImage.addEventListener("error", function () {
+            zoomImage.style.opacity = "0";
+        });
+
+        zoomImage.addEventListener("load", function () {
+            if (modal.classList.contains("is-open")) {
+                zoomImage.style.opacity = "1";
+            }
+        });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initProductZoom, { once: true });
+    } else {
+        initProductZoom();
+    }
+})();
+</script>
+
+
+<script id="product-image-click-cursor">
+(function () {
+    function markProductImages() {
+        document.querySelectorAll(".product img").forEach(function (img) {
+            img.classList.add("product-image-clickable");
+        });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", markProductImages, { once: true });
+    } else {
+        markProductImages();
+    }
 })();
 </script>
 
