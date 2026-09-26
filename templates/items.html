@@ -148,7 +148,7 @@
       opacity: 0.95; box-shadow: 0 0 30px rgba(168, 85, 247, 0.5); color: #fff;
     }
 
-    /* Category bar - Fixed smoothly right under topbar with zero clipping */
+    /* Category bar - Fixed smoothly right under topbar */
     .category-bar {
       position: fixed; top: var(--header-height); left: 0; right: 0; z-index: 1150;
       height: var(--category-bar-height);
@@ -182,7 +182,7 @@
       box-shadow: var(--glow-shadow); transform: scale(1.04);
     }
 
-    /* Main Container Layout with safe top margin to prevent any top clipping */
+    /* Main Container Layout with safe top margin */
     .container-main {
       max-width: 1320px; 
       margin: calc(var(--header-height) + var(--category-bar-height) + 20px) auto 40px; 
@@ -202,6 +202,7 @@
 
     .category-block-header {
       display: flex; align-items: center; gap: 10px; margin: 20px 0 16px 4px;
+      scroll-margin-top: calc(var(--header-height) + var(--category-bar-height) + 16px);
     }
     .category-block-header h5 {
       margin: 0; font-weight: 800; font-size: 1.2rem; color: var(--text-main);
@@ -443,7 +444,7 @@
     }
 
     /* Subcategory Hub & Fresh Vegetables Hub Styles */
-    .subcategory-hub{margin:0 0 24px;padding:18px;border-radius:20px;background:linear-gradient(135deg,rgba(99,102,241,.10),rgba(34,197,94,.08));border:1px solid rgba(148,163,184,.20);box-shadow:0 10px 28px rgba(0,0,0,.12)}
+    .subcategory-hub{margin:0 0 24px;padding:18px;border-radius:20px;background:linear-gradient(135deg,rgba(99,102,241,.10),rgba(34,197,94,.08));border:1px solid rgba(148,163,184,.20);box-shadow:0 10px 28px rgba(0,0,0,.12); scroll-margin-top: calc(var(--header-height) + var(--category-bar-height) + 16px);}
     .subcategory-hub-head{display:flex;align-items:center;gap:12px;margin-bottom:13px}
     .subcategory-hub-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4f46e5,#16a34a);color:#fff;font-size:21px;box-shadow:0 8px 20px rgba(79,70,229,.20);flex-shrink:0}
     .subcategory-hub-head h4{margin:0;font-size:1.08rem;font-weight:850;color:var(--text-main)}
@@ -528,7 +529,7 @@
 </head>
 <body>
 
-  <!-- Topbar -->
+  <!-- Topbar (Search Item Partition) -->
   <header class="topbar">
     <div class="brand">
       <div class="logo">G</div>
@@ -549,7 +550,7 @@
     </div>
   </header>
 
-  <!-- Category Bar -->
+  <!-- Category Bar placed immediately under the search item partition -->
   <nav class="category-bar" aria-label="Categories">
     <div class="category-list">
       {% for category, items in categories.items() %}
@@ -637,6 +638,21 @@
   <script>
     const FREE_THRESHOLD = 199;
     const DELIVERY_FEE = 30;
+
+    // Dynamic Layout & Height Calculation
+    function updateLayoutHeights() {
+      const topbar = document.querySelector('.topbar');
+      const categoryBar = document.querySelector('.category-bar');
+      const headerH = topbar ? topbar.offsetHeight : 76;
+      const catH = categoryBar ? categoryBar.offsetHeight : 60;
+      
+      document.documentElement.style.setProperty('--header-height', headerH + 'px');
+      document.documentElement.style.setProperty('--category-bar-height', catH + 'px');
+      document.documentElement.style.setProperty('scroll-padding-top', (headerH + catH + 16) + 'px');
+    }
+
+    window.addEventListener('resize', updateLayoutHeights);
+    window.addEventListener('DOMContentLoaded', updateLayoutHeights);
 
     function showToast(msg) {
       const t = document.getElementById('toast');
@@ -845,12 +861,41 @@
 
       const pills=Array.from(list.querySelectorAll(".category-pill")), rank={};Object.keys(GROUPS).forEach((m,i)=>rank[normalize(m)]=i);
       pills.sort((a,b)=>(rank[normalize(a.textContent)]??99)-(rank[normalize(b.textContent)]??99)).forEach(p=>list.appendChild(p));
+      
+      // Precise Calculated Scrolling for Category Pills
       pills.forEach(p=>p.addEventListener("click",function(){
-        pills.forEach(x=>x.classList.remove("active"));p.classList.add("active");p.scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"});
-        const hub=hubs[p.textContent.trim()];
-        if(hub){hub.scrollIntoView({behavior:"smooth",block:"start"});const all=hub.querySelector('[data-filter="all"]');if(all)all.click();}
-        else{const target=document.querySelector(p.dataset.target);if(target)target.scrollIntoView({behavior:"smooth",block:"start"});}
+        pills.forEach(x=>x.classList.remove("active"));
+        p.classList.add("active");
+        p.scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"});
+        
+        const hub = hubs[p.textContent.trim()];
+        const targetElement = hub || document.querySelector(p.dataset.target);
+        
+        if (targetElement) {
+          const itemsPanel = document.querySelector('.items-panel');
+          const topbarH = document.querySelector('.topbar')?.offsetHeight || 76;
+          const catBarH = document.querySelector('.category-bar')?.offsetHeight || 60;
+          const totalOffset = topbarH + catBarH + 16;
+
+          if (window.innerWidth > 992 && itemsPanel) {
+            const panelRect = itemsPanel.getBoundingClientRect();
+            const elemRect = targetElement.getBoundingClientRect();
+            const currentScroll = itemsPanel.scrollTop;
+            const targetScroll = currentScroll + (elemRect.top - panelRect.top) - 16;
+            itemsPanel.scrollTo({ top: targetScroll, behavior: 'smooth' });
+          } else {
+            const elemRect = targetElement.getBoundingClientRect();
+            const targetScroll = window.pageYOffset + elemRect.top - totalOffset;
+            window.scrollTo({ top: targetScroll, behavior: 'smooth' });
+          }
+
+          if (hub) {
+            const all = hub.querySelector('[data-filter="all"]');
+            if (all) all.click();
+          }
+        }
       }));
+
       const first=pills.find(p=>hubs[p.textContent.trim()]);if(first){pills.forEach(x=>x.classList.remove("active"));first.classList.add("active");}
     }
     if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
