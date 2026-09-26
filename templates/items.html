@@ -493,7 +493,46 @@
       .product.motion-ready { opacity: 1; transform: none; }
     }
 
-  </style>
+  
+    /* Multi-category subcategory navigation - isolated UI only */
+    .subcategory-hub{margin:0 0 24px;padding:18px;border-radius:20px;background:linear-gradient(135deg,rgba(99,102,241,.10),rgba(34,197,94,.08));border:1px solid rgba(148,163,184,.20);box-shadow:0 10px 28px rgba(0,0,0,.12)}
+    .subcategory-hub-head{display:flex;align-items:center;gap:12px;margin-bottom:13px}
+    .subcategory-hub-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4f46e5,#16a34a);color:#fff;font-size:21px;box-shadow:0 8px 20px rgba(79,70,229,.20)}
+    .subcategory-hub-head h4{margin:0;font-size:1.08rem;font-weight:850;color:var(--text-main)}
+    .subcategory-hub-head p{margin:2px 0 0;color:var(--text-muted);font-size:.76rem}
+    .subcategory-tabs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 2px 4px}
+    .subcategory-tabs::-webkit-scrollbar{display:none}
+    .subcategory-tab{flex:0 0 auto;border:1px solid var(--border-color);background:rgba(255,255,255,.05);color:var(--text-muted);border-radius:999px;padding:8px 13px;font-size:.77rem;font-weight:750;cursor:pointer;transition:.22s ease}
+    .subcategory-tab:hover{color:var(--text-main);background:rgba(255,255,255,.09)}
+    .subcategory-tab.active{color:#fff;border-color:transparent;background:var(--accent-gradient);box-shadow:var(--glow-shadow);transform:scale(1.02)}
+    .subcategory-count{opacity:.72;margin-left:3px}
+    .subcategory-hidden{display:none!important}
+    @media(max-width:576px){.subcategory-hub{padding:14px;margin-bottom:18px}.subcategory-tab{padding:7px 11px;font-size:.72rem}.subcategory-hub-head{margin-bottom:10px}}
+    /* Fresh Vegetables sub-category UI - isolated front-end enhancement */
+    .fresh-veg-hub {
+      margin: 0 0 24px; padding: 18px; border-radius: 18px;
+      background: linear-gradient(135deg, rgba(34,197,94,.10), rgba(99,102,241,.08));
+      border: 1px solid rgba(134,239,172,.22);
+      box-shadow: 0 10px 28px rgba(0,0,0,.14);
+    }
+    .fresh-veg-head { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+    .fresh-veg-icon { width:42px; height:42px; border-radius:13px; display:flex; align-items:center; justify-content:center;
+      background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff; font-size:20px; box-shadow:0 8px 20px rgba(34,197,94,.25); }
+    .fresh-veg-head h4 { margin:0; font-size:1.08rem; font-weight:800; color:var(--text-main); }
+    .fresh-veg-head p { margin:2px 0 0; color:var(--text-muted); font-size:.76rem; }
+    .fresh-veg-tabs { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; padding:2px 2px 4px; }
+    .fresh-veg-tabs::-webkit-scrollbar { display:none; }
+    .fresh-veg-tab { flex:0 0 auto; border:1px solid var(--border-color); background:rgba(255,255,255,.05); color:var(--text-muted);
+      border-radius:999px; padding:8px 13px; font-size:.78rem; font-weight:700; cursor:pointer; transition:.22s ease; }
+    .fresh-veg-tab:hover { color:var(--text-main); background:rgba(255,255,255,.09); }
+    .fresh-veg-tab.active { color:#fff; border-color:transparent; background:linear-gradient(135deg,#22c55e,#16a34a); box-shadow:0 7px 18px rgba(34,197,94,.22); }
+    .fresh-veg-count { opacity:.72; margin-left:4px; }
+    .veg-section-hidden { display:none !important; }
+    .veg-empty { padding:26px 16px; text-align:center; color:var(--text-muted); border:1px dashed rgba(148,163,184,.25); border-radius:16px; margin-top:8px; }
+    .veg-section-label { display:flex; align-items:center; gap:8px; }
+    .veg-section-label .veg-dot { width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 0 5px rgba(34,197,94,.10); }
+    @media(max-width:576px){ .fresh-veg-hub{padding:14px;margin-bottom:18px}.fresh-veg-tab{padding:7px 11px;font-size:.73rem}.fresh-veg-head{margin-bottom:10px} }
+</style>
 
 
 
@@ -907,20 +946,7 @@
       handleScroll(window.scrollY || document.documentElement.scrollTop);
     }, { passive: true });
 
-    // Category Pill Scroll & Active State
-    document.querySelectorAll('.category-pill').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.category-pill').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-
-        const target = document.querySelector(btn.dataset.target);
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-    });
+    // Category navigation is handled by the isolated subcategory UI below.
 
     // Recalculate Order Summary (Desktop + Mobile)
     function recalcSummary() {
@@ -1071,141 +1097,69 @@
 
 
 
-<script id="category-order-only">
+<script id="multi-category-subcategory-ui">
 (function () {
   "use strict";
+  const GROUPS = {
+    "Fresh Vegetables":[["Leafy Vegetables","🥬"],["Root Vegetables","🥕"],["Gourds","🥒"],["Beans & Peas","🫘"],["Chilli & Capsicum","🌶️"],["Mushrooms","🍄"]],
+    "Meats, Fish & Eggs":[["Mutton","🍖"],["Chicken","🍗"],["Fish & Seafood","🐟"],["Eggs","🥚"]],
+    "Fresh Fruits":[["Bananas","🍌"],["Citrus Fruits","🍊"],["Apples & Pears","🍎"],["Mangoes","🥭"],["Melons","🍉"],["Exotic Fruits","🥝"]],
+    "Atta, Rice, Oil & Dals":[["Rice","🍚"],["Atta & Flour","🌾"],["Cooking Oils","🫗"],["Dals & Pulses","🫘"],["Sugar & Salt","🧂"],["Spices","🌶️"]],
+    "Dairy, Bread & Paneer":[["Milk & Curd","🥛"],["Paneer & Cheese","🧀"],["Butter & Spreads","🧈"],["Bread & Bakery","🍞"],["Dairy Drinks","🥤"],["Eggs","🥚"]],
+    "Home Food":[["Breakfast","🍳"],["Lunch","🍛"],["Dinner","🍽️"],["Snacks","🥪"],["Sweets & Desserts","🍰"],["Ready to Eat","🥡"]]
+  };
+  const ALIASES={"fresh vegetable":"Fresh Vegetables","vegetables":"Fresh Vegetables","vegitable":"Fresh Vegetables","vegetable":"Fresh Vegetables","meat fish eggs":"Meats, Fish & Eggs","meat fish and eggs":"Meats, Fish & Eggs","fresh fruit":"Fresh Fruits","fruits":"Fresh Fruits","rice dal atta":"Atta, Rice, Oil & Dals"};
+  const normalize=v=>(v||"").toLowerCase().trim().replace(/&/g,"and").replace(/\s+/g," ");
+  const subToMain={};
+  Object.entries(GROUPS).forEach(([main,subs])=>subs.forEach(([sub])=>subToMain[normalize(sub)]=main));
 
-  function normalize(value) {
-    return (value || "")
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, " ");
+  function init(){
+    const list=document.querySelector(".category-list"), products=document.getElementById("products-grid");
+    if(!list||!products)return;
+    const headers=Array.from(products.querySelectorAll(":scope > .category-block-header"));
+    const sections=headers.map(h=>({header:h,grid:h.nextElementSibling,name:(h.querySelector("h5")?.textContent||"").trim()})).filter(x=>x.grid&&x.grid.classList.contains("grid"));
+    const grouped={}; Object.keys(GROUPS).forEach(main=>grouped[main]=[]);
+    sections.forEach(sec=>{const main=subToMain[normalize(sec.name)]; if(main)grouped[main].push(sec);});
+
+    Array.from(list.querySelectorAll(".category-pill")).forEach(p=>{const t=normalize(p.textContent);if(subToMain[t]||ALIASES[t])p.remove();});
+    const existingMain={};
+    Array.from(list.querySelectorAll(".category-pill")).forEach(p=>{const match=Object.keys(GROUPS).find(m=>normalize(m)===normalize(p.textContent));if(match)existingMain[match]=p;});
+    Object.keys(GROUPS).forEach(main=>{
+      if(grouped[main].length&&!existingMain[main]){
+        const p=document.createElement("button");p.type="button";p.className="category-pill";p.textContent=main;p.dataset.uiMainCategory=main;list.appendChild(p);existingMain[main]=p;
+      }
+    });
+
+    const hubs={}, groupedNodes=new Set();
+    Object.entries(GROUPS).forEach(([main,subs])=>{
+      const secs=grouped[main]; if(!secs.length)return;
+      const hub=document.createElement("div"); hub.className="subcategory-hub"; hub.dataset.mainCategory=main;
+      const icon=main==="Fresh Vegetables"?"🥬":main==="Meats, Fish & Eggs"?"🥩":main==="Fresh Fruits"?"🍎":main==="Atta, Rice, Oil & Dals"?"🌾":main==="Dairy, Bread & Paneer"?"🥛":"🍱";
+      hub.innerHTML='<div class="subcategory-hub-head"><div class="subcategory-hub-icon">'+icon+'</div><div><h4>'+main+'</h4><p>Select a section to browse products</p></div></div><div class="subcategory-tabs" role="tablist"><button class="subcategory-tab active" type="button" data-filter="all">✨ All</button>'+subs.map(x=>'<button class="subcategory-tab" type="button" data-filter="'+x[0]+'">'+x[1]+' '+x[0]+' <span class="subcategory-count"></span></button>').join("")+'</div>';
+      hubs[main]=hub;
+      secs.forEach(sec=>{groupedNodes.add(sec.header);groupedNodes.add(sec.grid);sec.header.dataset.subcategory=sec.name;sec.grid.dataset.subcategory=sec.name;});
+      const apply=filter=>{secs.forEach(sec=>{const show=filter==="all"||normalize(sec.name)===normalize(filter);sec.header.classList.toggle("subcategory-hidden",!show);sec.grid.classList.toggle("subcategory-hidden",!show);});hub.querySelectorAll(".subcategory-tab").forEach(b=>b.classList.toggle("active",normalize(b.dataset.filter)===normalize(filter)));};
+      hub.querySelectorAll(".subcategory-tab").forEach(b=>b.addEventListener("click",()=>apply(b.dataset.filter)));
+      subs.forEach(([sub])=>{const sec=secs.find(s=>normalize(s.name)===normalize(sub));const btn=Array.from(hub.querySelectorAll(".subcategory-tab")).find(b=>normalize(b.dataset.filter)===normalize(sub));if(btn&&sec){const c=sec.grid.querySelectorAll(".product").length;if(c)btn.querySelector(".subcategory-count").textContent="("+c+")";}});
+    });
+
+    const ordered=[]; Object.keys(GROUPS).forEach(main=>{if(hubs[main]){ordered.push(hubs[main]);grouped[main].forEach(sec=>ordered.push(sec.header,sec.grid));}});
+    sections.forEach(sec=>{if(!groupedNodes.has(sec.header)&&!groupedNodes.has(sec.grid))ordered.push(sec.header,sec.grid);});
+    ordered.forEach(node=>products.appendChild(node));
+
+    const pills=Array.from(list.querySelectorAll(".category-pill")), rank={};Object.keys(GROUPS).forEach((m,i)=>rank[normalize(m)]=i);
+    pills.sort((a,b)=>(rank[normalize(a.textContent)]??99)-(rank[normalize(b.textContent)]??99)).forEach(p=>list.appendChild(p));
+    pills.forEach(p=>p.addEventListener("click",function(){
+      pills.forEach(x=>x.classList.remove("active"));p.classList.add("active");p.scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"});
+      const hub=hubs[p.textContent.trim()];
+      if(hub){hub.scrollIntoView({behavior:"smooth",block:"start"});const all=hub.querySelector('[data-filter="all"]');if(all)all.click();}
+      else{const target=document.querySelector(p.dataset.target);if(target)target.scrollIntoView({behavior:"smooth",block:"start"});}
+    }));
+    const first=pills.find(p=>hubs[p.textContent.trim()]);if(first){pills.forEach(x=>x.classList.remove("active"));first.classList.add("active");}
   }
-
-  function getOrder(name) {
-    const value = normalize(name);
-
-    // 1. Vegetable
-    if (value === "vegitable" || value === "vegetable" || value.includes("vegetable")) return 0;
-
-    // 2. Meat, Fish & Eggs
-    if (
-      value === "meats fish and eggs" ||
-      value.includes("meat") ||
-      value.includes("fish") ||
-      value.includes("egg")
-    ) return 1;
-
-    // 3. Fresh Fruits
-    if (
-      value === "fresh fruits" ||
-      value === "fresh fruit" ||
-      value === "fruits" ||
-      value.includes("fruit")
-    ) return 2;
-
-    // 4. Home Food
-    if (
-      value === "home food" ||
-      value === "food" ||
-      value.includes("home food")
-    ) return 3;
-
-    // 5. Rice, Dal & Atta
-    if (
-      value === "rice dal atta" ||
-      value.includes("rice") ||
-      value.includes("dal") ||
-      value.includes("atta")
-    ) return 4;
-
-    return 999;
-  }
-
-  function reorderCategories() {
-    const categoryList = document.querySelector(".category-list");
-    const productsGrid = document.getElementById("products-grid");
-
-    if (!categoryList || !productsGrid) return;
-
-    const pills = Array.from(categoryList.querySelectorAll(".category-pill"));
-
-    pills.forEach(function (pill, index) {
-      pill.dataset.categoryOriginalIndex = index;
-    });
-
-    pills.sort(function (a, b) {
-      const orderA = getOrder(a.textContent);
-      const orderB = getOrder(b.textContent);
-
-      if (orderA !== orderB) return orderA - orderB;
-
-      return (
-        Number(a.dataset.categoryOriginalIndex) -
-        Number(b.dataset.categoryOriginalIndex)
-      );
-    });
-
-    const pillFragment = document.createDocumentFragment();
-
-    pills.forEach(function (pill) {
-      pillFragment.appendChild(pill);
-    });
-
-    categoryList.appendChild(pillFragment);
-
-    const headers = Array.from(
-      productsGrid.querySelectorAll(".category-block-header")
-    );
-
-    const sections = headers
-      .map(function (header, index) {
-        return {
-          header: header,
-          grid: header.nextElementSibling,
-          name: normalize(header.querySelector("h5")?.textContent || ""),
-          originalIndex: index
-        };
-      })
-      .filter(function (section) {
-        return section.grid;
-      });
-
-    sections.sort(function (a, b) {
-      const orderA = getOrder(a.name);
-      const orderB = getOrder(b.name);
-
-      if (orderA !== orderB) return orderA - orderB;
-
-      return a.originalIndex - b.originalIndex;
-    });
-
-    const sectionFragment = document.createDocumentFragment();
-
-    sections.forEach(function (section) {
-      sectionFragment.appendChild(section.header);
-      sectionFragment.appendChild(section.grid);
-    });
-
-    productsGrid.appendChild(sectionFragment);
-
-    pills.forEach(function (pill) {
-      pill.classList.remove("active");
-    });
-
-    if (pills.length) {
-      pills[0].classList.add("active");
-    }
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", reorderCategories, { once: true });
-  } else {
-    reorderCategories();
-  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
 })();
 </script>
-
 
 <!-- Product Double-Click Preview Modal -->
 <div id="productZoomModal" class="product-zoom-modal" aria-hidden="true">

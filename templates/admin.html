@@ -150,7 +150,15 @@
             justify-content: space-between;
             margin-bottom: 0.5rem;
         }
-    </style>
+    
+        /* Multi-category subcategory UI - front-end only */
+    .subcategory-preview-panel{margin-top:6px;padding:16px 18px;border:1px solid rgba(99,102,241,.14);border-radius:16px;background:linear-gradient(135deg,rgba(99,102,241,.06),rgba(34,197,94,.05))}
+    .subcategory-preview-title{font-weight:800;color:#334155;font-size:.88rem}
+    .subcategory-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+    .subcategory-chip{display:inline-flex;align-items:center;gap:5px;padding:7px 10px;border-radius:999px;background:#fff;border:1px solid #e2e8f0;color:#475569;font-size:.75rem;font-weight:700}
+    .subcategory-chip i{color:#6366f1}
+    .subcategory-select-populated{border-color:#a5b4fc;box-shadow:0 0 0 .2rem rgba(99,102,241,.08)}
+</style>
 
 <style id="admin-scroll-preservation">html{scroll-behavior:auto!important}body{overflow-anchor:auto}</style>
 </head>
@@ -380,17 +388,29 @@
                             <input class="form-control" type="text" name="name" placeholder="e.g. Organic Apples" required>
                         </div>
 
-                        <div class="col-md-4">
-                            <label class="form-label text-secondary small fw-bold">CATEGORY</label>
-                            <select class="form-select" name="category" required>
-                                <option value="Fresh Vegetables">Fresh Vegetables</option>
-                                <option value="Meats, Fish & Eggs">Meats, Fish & Eggs</option>
-                                <option value="Fresh Fruits">Fresh Fruits</option>
-                                <option value="Atta, Rice, Oil & Dals">Atta, Rice, Oil & Dals</option>
-                                <option value="Dairy, Bread & Eggs">Dairy, Bread & Paneer</option>
-                                <option value="Home Food">Home Food</option>
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary small fw-bold">MAIN CATEGORY</label>
+                            <select class="form-select" id="mainCategory" name="main_category" required>
+                                <option value="" disabled selected>Choose main category...</option>
+                                <option value="Fresh Vegetables">🥬 Fresh Vegetables</option>
+                                <option value="Meats, Fish & Eggs">🥩 Meats, Fish & Eggs</option>
+                                <option value="Fresh Fruits">🍎 Fresh Fruits</option>
+                                <option value="Atta, Rice, Oil & Dals">🌾 Atta, Rice, Oil & Dals</option>
+                                <option value="Dairy, Bread & Paneer">🥛 Dairy, Bread & Paneer</option>
+                                <option value="Home Food">🍱 Home Food</option>
                             </select>
                         </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary small fw-bold">SUB-CATEGORY</label>
+                            <select class="form-select" id="itemSubcategory" name="item_subcategory" required disabled>
+                                <option value="" selected>Choose a main category first...</option>
+                            </select>
+                            <div class="form-text" id="subcategoryHint">Choose a main category to see its product sections.</div>
+                        </div>
+
+                        <!-- Compatibility field: app.py continues reading the existing category field. -->
+                        <input type="hidden" name="category" id="storedCategory" value="">
 
                         <div class="col-md-4">
                             <label class="form-label text-secondary small fw-bold">PRICE (₹)</label>
@@ -581,6 +601,112 @@
             }
         }
     </script>
+
+
+<script id="multi-category-subcategory-admin-ui">
+(function () {
+    "use strict";
+
+    const main = document.getElementById("mainCategory");
+    const sub = document.getElementById("itemSubcategory");
+    const stored = document.getElementById("storedCategory");
+    const hint = document.getElementById("subcategoryHint");
+    const form = stored ? stored.closest("form") : null;
+    if (!main || !sub || !stored || !form) return;
+
+    const GROUPS = {
+        "Fresh Vegetables": [
+            ["Leafy Vegetables","🥬"],["Root Vegetables","🥕"],["Gourds","🥒"],
+            ["Beans & Peas","🫘"],["Chilli & Capsicum","🌶️"],["Mushrooms","🍄"]
+        ],
+        "Meats, Fish & Eggs": [
+            ["Mutton","🍖"],["Chicken","🍗"],["Fish & Seafood","🐟"],["Eggs","🥚"]
+        ],
+        "Fresh Fruits": [
+            ["Bananas","🍌"],["Citrus Fruits","🍊"],["Apples & Pears","🍎"],
+            ["Mangoes","🥭"],["Melons","🍉"],["Exotic Fruits","🥝"]
+        ],
+        "Atta, Rice, Oil & Dals": [
+            ["Rice","🍚"],["Atta & Flour","🌾"],["Cooking Oils","🫗"],
+            ["Dals & Pulses","🫘"],["Sugar & Salt","🧂"],["Spices","🌶️"]
+        ],
+        "Dairy, Bread & Paneer": [
+            ["Milk & Curd","🥛"],["Paneer & Cheese","🧀"],["Butter & Spreads","🧈"],
+            ["Bread & Bakery","🍞"],["Dairy Drinks","🥤"],["Eggs","🥚"]
+        ],
+        "Home Food": [
+            ["Breakfast","🍳"],["Lunch","🍛"],["Dinner","🍽️"],
+            ["Snacks","🥪"],["Sweets & Desserts","🍰"],["Ready to Eat","🥡"]
+        ]
+    };
+
+    function renderOptions() {
+        const group = GROUPS[main.value] || [];
+        sub.innerHTML = '<option value="" disabled selected>Choose sub-category...</option>';
+        group.forEach(function (entry) {
+            const opt = document.createElement("option");
+            opt.value = entry[0];
+            opt.textContent = entry[1] + " " + entry[0];
+            sub.appendChild(opt);
+        });
+        sub.disabled = group.length === 0;
+        sub.required = group.length > 0;
+        sub.classList.toggle("subcategory-select-populated", group.length > 0);
+        if (hint) hint.textContent = group.length
+            ? "This selection is saved in the existing Category field; no database column is added."
+            : "Choose a main category to see its product sections.";
+        renderGuide(group);
+    }
+
+    function sync() {
+        stored.value = sub.value || "";
+    }
+
+    function renderGuide(group) {
+        const row = main.closest(".row");
+        if (!row) return;
+        let guide = document.getElementById("subcategoryGuide");
+        if (!guide) {
+            guide = document.createElement("div");
+            guide.id = "subcategoryGuide";
+            guide.className = "col-12";
+            row.appendChild(guide);
+        }
+        if (!group.length) {
+            guide.innerHTML = "";
+            return;
+        }
+        guide.innerHTML =
+            '<div class="subcategory-preview-panel">' +
+              '<div class="subcategory-preview-title"><i class="bi bi-diagram-3 me-1"></i>' +
+              main.value + ' sections</div>' +
+              '<div class="subcategory-chips">' +
+              group.map(function(x){ return '<span class="subcategory-chip"><i class="bi bi-check2-circle"></i>' + x[0] + '</span>'; }).join("") +
+              '</div>' +
+            '</div>';
+    }
+
+    main.addEventListener("change", function () {
+        renderOptions();
+        sync();
+    });
+    sub.addEventListener("change", sync);
+
+    form.addEventListener("submit", function (event) {
+        sync();
+        if (!main.value || !sub.value) {
+            event.preventDefault();
+            sub.focus();
+            sub.classList.add("is-invalid");
+        } else {
+            sub.classList.remove("is-invalid");
+        }
+    });
+
+    renderOptions();
+    sync();
+})();
+</script>
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
